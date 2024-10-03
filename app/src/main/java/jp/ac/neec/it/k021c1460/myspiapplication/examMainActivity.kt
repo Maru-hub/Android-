@@ -10,8 +10,6 @@ class examMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam_main)
-
-
         // ホームボタンであるButtonオブジェクトを取得
         val btBack = findViewById<Button>(R.id.bt_back)
         // リスナクラスのインスタンスを生成

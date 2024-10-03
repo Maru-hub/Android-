@@ -1,0 +1,33 @@
+
+
+
+
+{
+  "project_info": {
+    "project_number": "438287454616",
+    "project_id": "big-asset-project",
+    "storage_bucket": "big-asset-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438287454616:android:1e8472b3d123a432a09bed",
+        "android_client_info": {
+          "package_name": "jp.ac.neec.it.k021c1348.myspiapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_duaLXkbNSD0s9_2RK8ZlTI8A57938sQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
