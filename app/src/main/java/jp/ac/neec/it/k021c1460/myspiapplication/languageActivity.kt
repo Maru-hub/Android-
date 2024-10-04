@@ -1,8 +1,10 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -26,7 +28,7 @@ class languageActivity : AppCompatActivity() {
         //リストビューにアダプタオブジェクトを設定。
         lvGame.adapter = adapter
         //リストビューにリスナを設定。
-        //lvGame.onItemClickListener = ListItemClickListener()
+        lvGame.onItemClickListener = ListItemClickListener()
         // ホームボタンであるButtonオブジェクトを取得
         val btBack = findViewById<Button>(R.id.btHome1)
         // リスナクラスのインスタンスを生成
@@ -34,6 +36,14 @@ class languageActivity : AppCompatActivity() {
         // 最初の画面に戻るボタンにリスナを設定
         btBack.setOnClickListener(listener)
     }
+    private inner class ListItemClickListener : AdapterView.OnItemClickListener{
+        override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            val item = parent?.getItemAtPosition(position)
+            val intent_anser =  Intent(this@languageActivity,anserActivity::class.java)
+            startActivity(intent_anser)
+        }
+    }
+
     //戻るボタンをタップした時の処理。
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
