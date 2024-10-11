@@ -6,9 +6,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AnserActivity"
+    tools:context=".AnswerActivity"
     android:fitsSystemWindows="true">
-
 
     <TextView
         android:id="@+id/textView2"

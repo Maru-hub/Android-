@@ -91,7 +91,7 @@ class SelectActivity : AppCompatActivity() {
 
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
-            val intentanser = Intent(this@SelectActivity, anserActivity::class.java)
+            val intentanser = Intent(this@SelectActivity, AnswerActivity::class.java)
             startActivity(intentanser)
             }
         }
