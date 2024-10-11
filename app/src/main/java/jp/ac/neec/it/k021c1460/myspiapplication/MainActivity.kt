@@ -1,11 +1,18 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Display
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ListView
+import android.widget.SimpleAdapter
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +37,34 @@ class MainActivity : AppCompatActivity() {
         val btresult = findViewById<Button>(R.id.btresult)
         // 模試試験ボタンにリスナ設定
         btresult.setOnClickListener(listener)
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_options_menu_list, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val returnVal = true
+        when(item.itemId){
+            R.id.menuListfirst -> {
+                val intent = Intent(this, FirstActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.menuListsecond -> {
+                val intent = Intent(this, SecondActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.menuListthird -> {
+                val intent = Intent(this, ThirdActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.menuListfourth -> {
+                val intent = Intent(this, FourthActivity::class.java)
+                startActivity(intent)
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+        return returnVal
     }
 
     private inner class HelloListener : View.OnClickListener {

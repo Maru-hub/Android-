@@ -19,6 +19,24 @@
             android:name=".anserActivity"
             android:exported="false" />
         <activity
+            android:name=".NextQuestionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".examSabActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FourthActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ThirdActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SecondActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FirstActivity"
+            android:exported="false" />
+        <activity
             android:name=".examMainActivity"
             android:exported="false" />
         <activity
