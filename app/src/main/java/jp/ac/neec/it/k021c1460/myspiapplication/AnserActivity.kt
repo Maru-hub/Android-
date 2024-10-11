@@ -18,7 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
-class MainActivity2 : AppCompatActivity() {
+class AnserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -82,7 +82,7 @@ class MainActivity2 : AppCompatActivity() {
             class HelloListener : View.OnClickListener {
                 override fun onClick(view: View){
 
-                    val intentActivity2 = Intent(this@MainActivity2,MainActivity2::class.java)
+                    val intentActivity2 = Intent(this@AnserActivity,AnserActivity::class.java)
                     startActivity(intentActivity2)
                 }
             }
