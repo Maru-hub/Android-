@@ -5,8 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_constraintCircleRadius="8sp"
-    tools:context=".SelectActivity">
+    tools:context=".SelectActivity"
+    android:fitsSystemWindows="true">
 
     <TextView
         android:id="@+id/textView8"
