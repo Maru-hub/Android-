@@ -28,9 +28,6 @@
             android:name=".nonlanguageActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity"
-            android:exported="false" />
-        <activity
             android:name=".languageActivity"
             android:exported="false" />
         <activity

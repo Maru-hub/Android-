@@ -17,7 +17,7 @@ class languageActivity : AppCompatActivity() {
         //ListViewオブジェクトを取得。
         val lvGame = findViewById<ListView>(R.id.lvLanguage)
         //リストビューに表示するリストデータを作成。
-        var languageList = mutableListOf(
+        val languageList = mutableListOf(
             "二語の関係", "熟語の成り立ち", "語句の意味",
             "文の並び替え", "空欄補充", "長文読解")
         //アダプタオブジェクトを生成。
