@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menuListfirst"
+        app:showAsAction="never"
+        android:title="このアプリを使うにあたって"/>
+    <item
+        android:id="@+id/menuListsecond"
+        app:showAsAction="never"
+        android:title="SPIについて"/>
+    <item
+        android:id="@+id/menuListthird"
+        app:showAsAction="never"
+        android:title="能力検査の評価基準について"/>
+    <item
+        android:id="@+id/menuListfourth"
+        app:showAsAction="never"
+        android:title="テストの種類"/>
+    </menu>
