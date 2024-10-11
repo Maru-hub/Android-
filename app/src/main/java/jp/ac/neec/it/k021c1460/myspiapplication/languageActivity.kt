@@ -39,8 +39,8 @@ class languageActivity : AppCompatActivity() {
     private inner class ListItemClickListener : AdapterView.OnItemClickListener{
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             val item = parent?.getItemAtPosition(position)
-            val intent_anser =  Intent(this@languageActivity,anserActivity::class.java)
-            startActivity(intent_anser)
+            val intent_select =  Intent(this@languageActivity,SelectActivity::class.java)
+            startActivity(intent_select)
         }
     }
 
