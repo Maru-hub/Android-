@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TableLayout
@@ -87,6 +88,19 @@ class SelectActivity : AppCompatActivity() {
                 Log.d(TAG, "Count failed: ", task.getException())
             }
         }
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // 戻り値用の変数を初期値trueで用意
+        var returnVal = true
+        // 選択されたメニューが「戻る」の場合、アクティビティを終了。
+        if (item.itemId == android.R.id.home) {
+            finish()
+        } else {
+            returnVal = super.onOptionsItemSelected(item)
+        }
+        return returnVal
     }
 
     private inner class HelloListener : View.OnClickListener {

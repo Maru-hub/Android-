@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -89,7 +90,21 @@ class MainActivity2 : AppCompatActivity() {
             val btClick = findViewById<Button>(R.id.button2)
             val listener = HelloListener()
             btClick.setOnClickListener(listener)
+
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // 戻り値用の変数を初期値trueで用意
+        var returnVal = true
+        // 選択されたメニューが「戻る」の場合、アクティビティを終了。
+        if (item.itemId == android.R.id.home) {
+            finish()
+        } else {
+            returnVal = super.onOptionsItemSelected(item)
+        }
+        return returnVal
     }
 }
 class anserActivity : AppCompatActivity() {
