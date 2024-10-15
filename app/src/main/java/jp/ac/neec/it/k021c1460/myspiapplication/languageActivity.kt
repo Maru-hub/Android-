@@ -18,7 +18,7 @@ class languageActivity : AppCompatActivity() {
         //ListViewオブジェクトを取得。
         val lvGame = findViewById<ListView>(R.id.lvLanguage)
         //リストビューに表示するリストデータを作成。
-        var languageList = mutableListOf(
+        val languageList = mutableListOf(
             "二語の関係", "熟語の成り立ち", "語句の意味",
             "文の並び替え", "空欄補充", "長文読解")
         //アダプタオブジェクトを生成。
@@ -54,8 +54,8 @@ class languageActivity : AppCompatActivity() {
     private inner class ListItemClickListener : AdapterView.OnItemClickListener{
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             val item = parent?.getItemAtPosition(position)
-            val intent_anser =  Intent(this@languageActivity,anserActivity::class.java)
-            startActivity(intent_anser)
+            val intent_select =  Intent(this@languageActivity,SelectActivity::class.java)
+            startActivity(intent_select)
         }
     }
 
