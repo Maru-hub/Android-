@@ -16,7 +16,7 @@
             android:name=".SelectActivity"
             android:exported="false" />
         <activity
-            android:name=".anserActivity"
+            android:name=".AnswerActivity"
             android:exported="false" />
         <activity
             android:name=".NextQuestionActivity"

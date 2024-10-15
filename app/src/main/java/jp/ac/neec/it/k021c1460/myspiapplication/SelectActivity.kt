@@ -50,7 +50,7 @@ class SelectActivity : AppCompatActivity() {
                 // 最初の画面に戻るボタンにリスナを設定
                 button.setOnClickListener(listener)
 
-                button.setBackgroundColor(Color.parseColor("#65BBE9"))
+                button.setBackgroundColor(Color.parseColor("#1972a4"))
                 val layoutParams = TableRow.LayoutParams(
                     0, 96, 0.3f
                 ).apply { setMargins(8, 8, 8, 8) } // 左右に8dpのマージンを設定
@@ -105,7 +105,7 @@ class SelectActivity : AppCompatActivity() {
 
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
-            val intentanser = Intent(this@SelectActivity, anserActivity::class.java)
+            val intentanser = Intent(this@SelectActivity, AnswerActivity::class.java)
             startActivity(intentanser)
             }
         }

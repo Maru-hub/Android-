@@ -1,5 +1,4 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
-//package jp.ac.neec.it.k021c1348.a20240716project1
 
 import android.os.Bundle
 import android.util.Log
@@ -19,11 +18,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
-class MainActivity2 : AppCompatActivity() {
+class AnswerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_anser)
+        setContentView(R.layout.activity_answer)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -83,8 +82,8 @@ class MainActivity2 : AppCompatActivity() {
             class HelloListener : View.OnClickListener {
                 override fun onClick(view: View){
 
-                    val intentActivity2 = Intent(this@MainActivity2,MainActivity2::class.java)
-                    startActivity(intentActivity2)
+                    ///val intentActivity2 = Intent(this@AnswerActivity,AnswerActivity::class.java)
+                    //startActivity(intentActivity2)
                 }
             }
             val btClick = findViewById<Button>(R.id.button2)
@@ -105,17 +104,5 @@ class MainActivity2 : AppCompatActivity() {
             returnVal = super.onOptionsItemSelected(item)
         }
         return returnVal
-    }
-}
-class anserActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_anser)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
     }
 }
