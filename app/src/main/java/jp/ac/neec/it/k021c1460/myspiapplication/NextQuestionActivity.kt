@@ -1,6 +1,5 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
