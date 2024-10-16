@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TableRow
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -32,6 +33,9 @@ class SelectActivity : AppCompatActivity() {
         val db = Firebase.firestore
         val itemName = intent.getStringExtra("itemName")
         val tableLayout = findViewById<TableLayout>(R.id.tableLayout)
+
+        val tv8 = findViewById<TextView>(R.id.textView8)
+        tv8.text = itemName
 
         // ボタンを動的に生成して、TableLayoutに追加する
         val totalButtons = 10
