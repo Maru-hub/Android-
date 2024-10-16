@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TableRow
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -19,12 +18,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.firestore
 
-
-class SelectActivity : AppCompatActivity() {
+class SelectActivity1 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_select)
+        setContentView(R.layout.activity_select1)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -33,9 +31,6 @@ class SelectActivity : AppCompatActivity() {
         val db = Firebase.firestore
         val itemName = intent.getStringExtra("itemName")
         val tableLayout = findViewById<TableLayout>(R.id.tableLayout)
-
-        val tv8 = findViewById<TextView>(R.id.textView8)
-        tv8.text = itemName
 
         // ボタンを動的に生成して、TableLayoutに追加する
         val totalButtons = 10
@@ -109,7 +104,7 @@ class SelectActivity : AppCompatActivity() {
 
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
-            val intentanser = Intent(this@SelectActivity, AnswerActivity::class.java)
+            val intentanser = Intent(this@SelectActivity1, AnswerActivity::class.java)
             startActivity(intentanser)
         }
     }

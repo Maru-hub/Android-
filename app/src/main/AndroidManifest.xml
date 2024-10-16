@@ -13,6 +13,18 @@
         android:theme="@style/Theme.MySPIApplication"
         tools:targetApi="31">
         <activity
+            android:name=".ExplanationActivity1"
+            android:exported="false" />
+        <activity
+            android:name=".AnswerActivity1"
+            android:exported="false" />
+        <activity
+            android:name=".SelectActivity1"
+            android:exported="false" />
+        <activity
+            android:name=".ExplanationActivity"
+            android:exported="false" />
+        <activity
             android:name=".SelectActivity"
             android:exported="false" />
         <activity

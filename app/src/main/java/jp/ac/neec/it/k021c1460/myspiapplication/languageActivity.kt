@@ -37,6 +37,7 @@ class languageActivity : AppCompatActivity() {
         // 最初の画面に戻るボタンにリスナを設定
         btBack.setOnClickListener(listener)
 
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
