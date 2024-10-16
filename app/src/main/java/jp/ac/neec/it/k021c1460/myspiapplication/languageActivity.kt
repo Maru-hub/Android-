@@ -15,6 +15,7 @@ class languageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_language)
 
+
         //ListViewオブジェクトを取得。
         val lvGame = findViewById<ListView>(R.id.lvLanguage)
         //リストビューに表示するリストデータを作成。
