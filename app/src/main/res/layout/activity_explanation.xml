@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AnswerActivity"
+    tools:context=".ExplanationActivity"
     android:fitsSystemWindows="true">
 
     <TextView
@@ -14,9 +14,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="問題解答画面"
         android:layout_marginTop="40dp"
+        android:layout_marginEnd="8dp"
+        android:text="解答解説"
         android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,15 +30,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/question"/>
-
-    <Button
-        android:id="@+id/bt_next1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="次に進む"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/statement"
@@ -65,5 +56,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/statement" />
+
+    <Button
+        android:id="@+id/bt_homeback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="問題選択画面へ戻る"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

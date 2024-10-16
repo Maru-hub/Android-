@@ -18,12 +18,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.firestore
 
-
-class SelectActivity : AppCompatActivity() {
+class SelectActivity1 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_select)
+        setContentView(R.layout.activity_select1)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -105,7 +104,7 @@ class SelectActivity : AppCompatActivity() {
 
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
-            val intentanser = Intent(this@SelectActivity, AnswerActivity::class.java)
+            val intentanser = Intent(this@SelectActivity1, AnswerActivity::class.java)
             startActivity(intentanser)
         }
     }

@@ -18,11 +18,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
-class AnswerActivity : AppCompatActivity() {
+class AnswerActivity1 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_answer)
+        setContentView(R.layout.activity_answer1)
 
         // ホームボタンであるButtonオブジェクトを取得
         val btNext = findViewById<Button>(R.id.bt_next1)
@@ -36,7 +36,6 @@ class AnswerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         val db = Firebase.firestore
 
         val RgOpt = findViewById<RadioGroup>(R.id.radioGroup)
@@ -100,7 +99,6 @@ class AnswerActivity : AppCompatActivity() {
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 戻り値用の変数を初期値trueで用意
         var returnVal = true
@@ -118,7 +116,7 @@ class AnswerActivity : AppCompatActivity() {
         override fun onClick(view: View) {
             when(view.id){
                 R.id.bt_next1 -> {
-                    val intent2examMainActivity= Intent(this@AnswerActivity, ExplanationActivity::class.java)
+                    val intent2examMainActivity= Intent(this@AnswerActivity1, ExplanationActivity1::class.java)
                     startActivity(intent2examMainActivity)
                     finish()
                 }
