@@ -41,8 +41,8 @@ class AnswerActivity : AppCompatActivity() {
 
         val RgOpt = findViewById<RadioGroup>(R.id.radioGroup)
 
-        val partRef = db.collection("非言語").document("組み合わせ")
-        val questRef = partRef.collection("問題1").document("文章")
+        val partRef = db.collection("非言語").document("w5XM2qrNES9juV9Wj2Xw")
+        val questRef = partRef.collection("組み合わせ").document("問題1")
 
         questRef.get().addOnSuccessListener { documentSnapshot ->
             val docData = documentSnapshot.data
@@ -58,7 +58,7 @@ class AnswerActivity : AppCompatActivity() {
         }
 
 
-        val optRef = partRef.collection("問題1").document("選択肢")
+        val optRef = questRef.collection("選択肢").document("選択肢")
         optRef.get().addOnSuccessListener { documentSnapshot ->
             //documentはマップ？
             val document = documentSnapshot.data
@@ -113,7 +113,7 @@ class AnswerActivity : AppCompatActivity() {
         return returnVal
     }
 
-    //戻るボタンをタップした時の処理。
+    //解答を表示ボタンをタップした時の処理。
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             when(view.id){
