@@ -1,36 +1,63 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 class languageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_language)
 
+        val db = Firebase.firestore
 
-        //ListViewオブジェクトを取得。
-        val lvGame = findViewById<ListView>(R.id.lvLanguage)
-        //リストビューに表示するリストデータを作成。
-        val languageList = mutableListOf(
-            "二語の関係", "熟語の成り立ち", "語句の意味",
-            "文の並び替え", "空欄補充", "長文読解")
-        //アダプタオブジェクトを生成。
-        val adapter = ArrayAdapter(
-            this@languageActivity, android.R.layout.simple_list_item_1,
-            languageList
-        )
-        //リストビューにアダプタオブジェクトを設定。
-        lvGame.adapter = adapter
-        //リストビューにリスナを設定。
-        lvGame.onItemClickListener = ListItemClickListener()
+        val docRef = db.collection("言語").document("項目")
+            docRef.get().addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        // ドキュメントデータを取得
+                        val data = documentSnapshot.data
+                        Log.d("TAG", "Document data: $data")
+
+                        // ListViewオブジェクトを取得。
+                        val lvGame = findViewById<ListView>(R.id.lvLanguage)
+
+                        val ListData : MutableList<String> = mutableListOf()
+
+                        if (data != null) {
+                            for ((key, value) in data) {
+                                ListData.add(value.toString())
+                            }
+                        }
+
+                        Log.d("TAG", "list data: $ListData")
+                        // アダプタオブジェクトを生成。
+                        val adapter = ArrayAdapter(this@languageActivity,
+                            android.R.layout.simple_list_item_1,
+                            ListData // documentDataをそのまま渡す
+                        )
+
+                        lvGame.adapter = adapter // アダプタをListViewに設定
+
+                        //リストビューにリスナを設定。
+                        lvGame.onItemClickListener = ListItemClickListener()
+                    } else {
+                        Log.d("TAG", "No such document")
+                    }
+                }
+                    .addOnFailureListener { exception ->
+                        Log.w("TAG", "Error getting document", exception)
+                    }
+
         // ホームボタンであるButtonオブジェクトを取得
         val btBack = findViewById<Button>(R.id.btHome1)
         // リスナクラスのインスタンスを生成
