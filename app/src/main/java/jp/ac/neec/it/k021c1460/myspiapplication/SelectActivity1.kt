@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TableRow
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -32,6 +33,9 @@ class SelectActivity1 : AppCompatActivity() {
         val itemName = intent.getStringExtra("itemName")
         val tableLayout = findViewById<TableLayout>(R.id.tableLayout)
 
+        val tv8 = findViewById<TextView>(R.id.textView8)
+        tv8.text = itemName
+
         // ボタンを動的に生成して、TableLayoutに追加する
         val totalButtons = 10
         val buttonPlusNum = (totalButtons/3+1)*3
@@ -49,7 +53,7 @@ class SelectActivity1 : AppCompatActivity() {
                 // 最初の画面に戻るボタンにリスナを設定
                 button.setOnClickListener(listener)
 
-                button.setBackgroundColor(Color.parseColor("#65BBE9"))
+                button.setBackgroundColor(Color.parseColor("#1972a4"))
                 val layoutParams = TableRow.LayoutParams(
                     0, 96, 0.3f
                 ).apply { setMargins(8, 8, 8, 8) } // 左右に8dpのマージンを設定
