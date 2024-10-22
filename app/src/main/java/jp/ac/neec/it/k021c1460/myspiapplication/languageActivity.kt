@@ -85,6 +85,7 @@ class languageActivity : AppCompatActivity() {
             val item = parent.getItemAtPosition(position) as String
             val intent_select =  Intent(this@languageActivity,SelectActivity::class.java)
             intent_select.putExtra("itemName",item)
+            intent_select.putExtra("itemWhich","言語")
             startActivity(intent_select)
         }
     }

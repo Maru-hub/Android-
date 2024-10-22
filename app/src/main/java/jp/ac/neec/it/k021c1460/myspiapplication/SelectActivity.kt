@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.firestore
 
 
@@ -28,72 +27,76 @@ class SelectActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets }
+            insets
+        }
 
         val db = Firebase.firestore
         val itemName = intent.getStringExtra("itemName")
+        val itemWhich = intent.getStringExtra("itemWhich")
         val tableLayout = findViewById<TableLayout>(R.id.tableLayout)
 
         val tv8 = findViewById<TextView>(R.id.textView8)
         tv8.text = itemName
 
-        // ボタンを動的に生成して、TableLayoutに追加する
-        val totalButtons = 10
-        val buttonPlusNum = (totalButtons/3+1)*3
-        val buttonsPerRow = 3
 
-        for (i in 0 until totalButtons step buttonsPerRow) {
-            val tableRow = TableRow(this)
 
-            for (j in 0 until buttonsPerRow) {
-
-                val button = Button(this)
-
-                // リスナクラスのインスタンスを生成
-                val listener = HelloListener()
-                // 最初の画面に戻るボタンにリスナを設定
-                button.setOnClickListener(listener)
-
-                button.setBackgroundColor(Color.parseColor("#1972a4"))
-                val layoutParams = TableRow.LayoutParams(
-                    0, 96, 0.3f
-                ).apply { setMargins(8, 8, 8, 8) } // 左右に8dpのマージンを設定
-                // ボタンにレイアウトパラメータをセット
-                button.layoutParams = layoutParams
-
-                if ((i+j)+1 == buttonPlusNum || (i+j)+1 == buttonPlusNum-1) {
-                    button.text = ""
-                    button.alpha=0f
-                    button.isClickable = false
-                }
-                else {
-                    button.text = "問題 ${(i + j) + 1}"  // ボタンに番号を付ける
-                }
-
-                tableRow.addView(button)
-            }
-            // TableRowをTableLayoutに追加
-            tableLayout.addView(tableRow)
-        }
-
-        val partRef = db.collection("非言語").
-        document("7vYnfiq5TYFD4Kj2v3BW").
-        collection("組み合わせ")
-        val query = partRef
-        val countQuery = query.count()
-        countQuery.get(AggregateSource.SERVER).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                // Count fetched successfully
-                val snapshot = task.result
-                val num = snapshot.count
-                Log.d(TAG, "Count: ${num}")
-
+        fun addButton(buttonsNum: Int) {
+            val totalButtonNum = if (buttonsNum % 3 == 0) {
+                (buttonsNum / 3) * 3
             } else {
-                Log.d(TAG, "Count failed: ", task.getException())
+                (buttonsNum / 3 + 1) * 3
+            }
+            val buttonsPerRow = 3
+
+            for (i in 0 until totalButtonNum step buttonsPerRow) {
+                val tableRow = TableRow(this)
+
+                for (j in 0 until buttonsPerRow) {
+                    val button = Button(this)
+                    val buttonIndex = i + j + 1
+
+                    if (buttonIndex <= buttonsNum) {
+                        button.text = "問題 $buttonIndex"  // ボタンに番号を付ける
+                        button.setBackgroundColor(Color.parseColor("#1972a4"))
+                        // リスナクラスのインスタンスを生成
+                        val listener = HelloListener()
+                        // 最初の画面に戻るボタンにリスナを設定
+                        button.setOnClickListener(listener)
+                    } else {
+                        // 余分なボタンを非表示にする
+                        button.alpha = 0f
+                        button.isClickable = false
+                    }
+
+                    val layoutParams = TableRow.LayoutParams(
+                        0, 96, 0.3f
+                    ).apply { setMargins(8, 8, 8, 8) } // 左右に8dpのマージンを設定
+                    // ボタンにレイアウトパラメータをセット
+                    button.layoutParams = layoutParams
+
+                    tableRow.addView(button)
+                }
+                // TableRowをTableLayoutに追加
+                tableLayout.addView(tableRow)
             }
         }
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val quesRef = db.collection("$itemWhich").document("$itemName")
+        quesRef.get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                val questNum = documentSnapshot.getString("問題数")
+
+
+                Log.d(TAG, "questNum :$questNum")
+
+                if (questNum != null) {
+                    addButton(questNum.toInt())
+                }
+            }
+
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        }
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 戻り値用の変数を初期値trueで用意
@@ -106,7 +109,6 @@ class SelectActivity : AppCompatActivity() {
         }
         return returnVal
     }
-
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             val intentanser = Intent(this@SelectActivity, AnswerActivity::class.java)
