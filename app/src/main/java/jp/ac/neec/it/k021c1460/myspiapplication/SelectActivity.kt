@@ -56,7 +56,7 @@ class SelectActivity : AppCompatActivity() {
                     val buttonIndex = i + j + 1
 
                     if (buttonIndex <= buttonsNum) {
-                        button.text = "問題 $buttonIndex"  // ボタンに番号を付ける
+                        button.text = "問題"+buttonIndex  // ボタンに番号を付ける
                         button.setBackgroundColor(Color.parseColor("#1972a4"))
                         // リスナクラスのインスタンスを生成
                         val listener = HelloListener()
@@ -111,7 +111,18 @@ class SelectActivity : AppCompatActivity() {
     }
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
+
+            // 押されたボタンを Button 型にキャスト
+            val button = view as Button
+            // ボタンのテキストを取得
+            val buttonText = button.text.toString()
+
+            // ボタンのテキストを次のアクティビティに渡す
             val intentanser = Intent(this@SelectActivity, AnswerActivity::class.java)
+            // intentで itemName, itemWhich, questionNum (ボタンのテキスト) を渡す
+            intentanser.putExtra("itemName", intent.getStringExtra("itemName"))
+            intentanser.putExtra("itemWhich", intent.getStringExtra("itemWhich"))
+            intentanser.putExtra("questionNum", buttonText)  // ボタンのテキストを渡す
             startActivity(intentanser)
         }
     }

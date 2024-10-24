@@ -23,31 +23,33 @@ class AnswerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_answer)
-
-        // ホームボタンであるButtonオブジェクトを取得
-        val btNext = findViewById<Button>(R.id.bt_next1)
-        // リスナクラスのインスタンスを生成
-        val listener = HelloListener()
-        // 最初の画面に戻るボタンにリスナを設定
-        btNext.setOnClickListener(listener)
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
+        // ホームボタンであるButtonオブジェクトを取得
+        val btNext = findViewById<Button>(R.id.bt_nextbottn)
+        // リスナクラスのインスタンスを生成
+        val listener = HelloListener()
+        // 最初の画面に戻るボタンにリスナを設定
+        btNext.setOnClickListener(listener)
+
         val db = Firebase.firestore
 
+        val itemName = intent.getStringExtra("itemName")
+        val itemWhich = intent.getStringExtra("itemWhich")
+        val buttonText = intent.getStringExtra("questionNum")
         val RgOpt = findViewById<RadioGroup>(R.id.radioGroup)
 
-        val partRef = db.collection("非言語").document("w5XM2qrNES9juV9Wj2Xw")
-        val questRef = partRef.collection("組み合わせ").document("問題1")
+        val partRef = db.collection("$itemWhich").document("$itemName")
+        val questRef = partRef.collection("問題").document("$buttonText")
 
         questRef.get().addOnSuccessListener { documentSnapshot ->
             val docData = documentSnapshot.data
-            val statement = (docData?.get("設問文"))
-            val question = (docData?.get("問題文"))
+            val statement = (docData?.get("問題文"))
+            val question = (docData?.get("設問文"))
 
             val tvState = findViewById<TextView>(R.id.statement)
             val tvQuest = findViewById<TextView>(R.id.question)
@@ -84,19 +86,6 @@ class AnswerActivity : AppCompatActivity() {
                     add_option(k,v)
                 }
             }
-
-            //button listener
-            class HelloListener : View.OnClickListener {
-                override fun onClick(view: View){
-
-                    ///val intentActivity2 = Intent(this@AnswerActivity,AnswerActivity::class.java)
-                    //startActivity(intentActivity2)
-                }
-            }
-            val btClick = findViewById<Button>(R.id.bt_next1)
-            val listener = HelloListener()
-            btClick.setOnClickListener(listener)
-
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
@@ -116,13 +105,27 @@ class AnswerActivity : AppCompatActivity() {
     //解答を表示ボタンをタップした時の処理。
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
-            when(view.id){
-                R.id.bt_next1 -> {
-                    val intent2examMainActivity= Intent(this@AnswerActivity, ExplanationActivity::class.java)
-                    startActivity(intent2examMainActivity)
-                    finish()
+            val RgOpt = findViewById<RadioGroup>(R.id.radioGroup)
+            when (view.id) {
+                R.id.bt_nextbottn -> {
+                    // ラジオグループから選択されたボタンのIDを取得
+                    val selectedRadioButtonId = RgOpt.checkedRadioButtonId
+                    if (selectedRadioButtonId != -1) {
+                        // 選択されたラジオボタンを取得
+                        val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+                        val selectedAnswer = selectedRadioButton.text.toString()
+
+                        // Intentに選択された解答を渡す
+                        val intentAnswerActivity =
+                            Intent(this@AnswerActivity, ExplanationActivity::class.java)
+                        // intentで itemName, itemWhich, questionNum (ボタンのテキスト) を渡す
+                        intentAnswerActivity.putExtra("itemName", intent.getStringExtra("itemName"))
+                        intentAnswerActivity.putExtra("itemWhich", intent.getStringExtra("itemWhich"))
+                        intentAnswerActivity.putExtra("selectedAnswer", selectedAnswer)
+                        startActivity(intentAnswerActivity)
+                    }
                 }
             }
         }
     }
-}
+    }

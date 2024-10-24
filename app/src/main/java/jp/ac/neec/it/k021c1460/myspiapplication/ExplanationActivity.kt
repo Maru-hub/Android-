@@ -1,16 +1,30 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.content.ContentValues.TAG
+import android.content.Intent
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 class ExplanationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_explanation)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_answer)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         // ホームボタンであるButtonオブジェクトを取得
         val btHomeBack = findViewById<Button>(R.id.bt_homeback)
@@ -19,6 +33,29 @@ class ExplanationActivity : AppCompatActivity() {
         // 最初の画面に戻るボタンにリスナを設定
         btHomeBack.setOnClickListener(listener)
 
+        val db = Firebase.firestore
+
+        val itemName = intent.getStringExtra("itemName")
+        val itemWhich = intent.getStringExtra("itemWhich")
+        val buttonText = intent.getStringExtra("questionNum")
+        val selectedAnswer = intent.getStringExtra("selectedAnswer")
+
+        val partRef = db.collection("$itemWhich").document("$itemName")
+        val questRef = partRef.collection("問題").document("$buttonText")
+        val choiRef = questRef.collection("選択肢").document("正解選択肢")
+        choiRef.get().addOnSuccessListener { documentSnapshot ->
+            //documentはマップ？
+            val document = documentSnapshot.data
+
+            val yourAnswer = (document?.get(selectedAnswer))
+            val CorrectAnswer = (document?.get("正解選択肢"))
+            val tvAnswer = findViewById<TextView>(R.id.youanswer)
+            val tvCorrect = findViewById<TextView>(R.id.correctanswertext)
+            tvAnswer.text = yourAnswer.toString()
+            tvCorrect.text = CorrectAnswer.toString()
+
+            Log.d(TAG,"log document option Data: $document")
+        }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -38,6 +75,8 @@ class ExplanationActivity : AppCompatActivity() {
         override fun onClick(view: View) {
             when(view.id){
                 R.id.bt_homeback -> {
+                    val finish = Intent(this@ExplanationActivity, SelectActivity::class.java)
+                    startActivity(finish)
                     finish()
                 }
             }

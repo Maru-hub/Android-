@@ -81,7 +81,7 @@ class nonlanguageActivity : AppCompatActivity() {
     private inner class ListItemClickListener : AdapterView.OnItemClickListener{
         override fun onItemClick(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
             val item = parent.getItemAtPosition(position) as String
-            val intent_select =  Intent(this@nonlanguageActivity,SelectActivity1::class.java)
+            val intent_select =  Intent(this@nonlanguageActivity,SelectActivity::class.java)
             intent_select.putExtra("itemName",item)
             startActivity(intent_select)
         }
