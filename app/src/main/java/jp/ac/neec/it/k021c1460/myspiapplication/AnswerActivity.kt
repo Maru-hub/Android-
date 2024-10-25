@@ -59,7 +59,6 @@ class AnswerActivity : AppCompatActivity() {
             Log.d(TAG,"log document Data: $docData")
         }
 
-
         val optRef = questRef.collection("選択肢").document("選択肢")
         optRef.get().addOnSuccessListener { documentSnapshot ->
             //documentはマップ？
