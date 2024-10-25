@@ -13,6 +13,7 @@ class examMainActivity : AppCompatActivity() {
 
     private lateinit var circleProgressView: CircleProgressView
     private lateinit var timerTextView: TextView
+    private var countDownTimer: CountDownTimer? = null  // タイマーを保持する変数
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam_main)
@@ -20,38 +21,43 @@ class examMainActivity : AppCompatActivity() {
         circleProgressView = findViewById(R.id.circleProgressView)
         timerTextView = findViewById(R.id.timerTextView)
 
-        // 5秒のカウントダウンタイマーを開始
-        object : CountDownTimer(60, 1) {
-            override fun onTick(millisUntilFinished: Long) {
-                // 残り時間を秒単位で計算
-                val secondsLeft = millisUntilFinished
-                timerTextView.text = "残り時間: $secondsLeft 秒"
-
-                // 進捗を更新 (0から1の範囲)
-                val progress = (5000 - millisUntilFinished) / 5000f
-                circleProgressView.setProgress(progress)
-            }
-
-            override fun onFinish() {
-                timerTextView.text = "残り時間: 0秒"
-
-                // 次の画面に遷移
-                val intent = Intent(this@examMainActivity, examSabActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-        }.start()
+        startCountDownTimer()
 
         // ホームボタンであるButtonオブジェクトを取得
         val btBack = findViewById<Button>(R.id.bt_back)
         val btNext = findViewById<Button>(R.id.bt_next)
         // リスナクラスのインスタンスを生成
         val listener = HelloListener()
-        // 最初の画面に戻るボタンにリスナを設定
         btBack.setOnClickListener(listener)
         btNext.setOnClickListener(listener)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+    // カウントダウンタイマーの開始メソッド
+    private fun startCountDownTimer() {
+        // 5秒のカウントダウンタイマーを開始
+        countDownTimer = object : CountDownTimer(5000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = millisUntilFinished / 1000
+                timerTextView.text = "残り時間: $secondsLeft 秒"
+                val progress = (5000 - millisUntilFinished) / 5000f
+                circleProgressView.setProgress(progress)
+            }
+
+            override fun onFinish() {
+                timerTextView.text = "残り時間: 0秒"
+                moveToNextScreen()
+            }
+        }.start()
+    }
+
+    // 次の画面に遷移するメソッド
+    private fun moveToNextScreen() {
+        // タイマーをキャンセルして次の画面に遷移
+        countDownTimer?.cancel()
+        val intent = Intent(this@examMainActivity, examMainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -59,24 +65,33 @@ class examMainActivity : AppCompatActivity() {
         var returnVal = true
         // 選択されたメニューが「戻る」の場合、アクティビティを終了。
         if (item.itemId == android.R.id.home) {
+            countDownTimer?.cancel()  // 戻るボタン押下時にタイマーをキャンセル
             finish()
         } else {
             returnVal = super.onOptionsItemSelected(item)
         }
         return returnVal
     }
+
     //戻るボタンをタップした時の処理。
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             when(view.id){
                 R.id.bt_back -> {
+                    countDownTimer?.cancel()  // バックボタン押下時にタイマーをキャンセル
                     finish()
                 }
                 R.id.bt_next -> {
-                    val intent2examMainActivity= Intent(this@examMainActivity, examSabActivity::class.java)
-                    startActivity(intent2examMainActivity)
+                    countDownTimer?.cancel()  // 次へボタン押下時にタイマーをキャンセル
+                    moveToNextScreen()  // 同じ画面に戻る
                 }
             }
         }
+    }
+
+    // アクティビティが破棄される際に、タイマーがまだ動作している場合に備えてキャンセル
+    override fun onDestroy() {
+        countDownTimer?.cancel()  // アクティビティ終了時にタイマーをキャンセル
+        super.onDestroy()
     }
 }

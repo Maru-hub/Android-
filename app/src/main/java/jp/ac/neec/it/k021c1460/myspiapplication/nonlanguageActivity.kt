@@ -57,7 +57,7 @@ class nonlanguageActivity : AppCompatActivity() {
                 Log.w("TAG", "Error getting document", exception)
             }
         // ホームボタンであるButtonオブジェクトを取得
-        val btBack = findViewById<Button>(R.id.btHome1)
+        val btBack = findViewById<Button>(R.id.bthome2)
         // リスナクラスのインスタンスを生成
         val listener = HelloListener()
         // 最初の画面に戻るボタンにリスナを設定
@@ -92,7 +92,7 @@ class nonlanguageActivity : AppCompatActivity() {
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             when(view.id){
-                R.id.btHome1 -> {
+                R.id.bthome2-> {
                     finish()
                 }
             }
