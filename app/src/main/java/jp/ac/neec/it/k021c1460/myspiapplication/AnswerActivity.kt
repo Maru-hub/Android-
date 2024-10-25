@@ -121,8 +121,10 @@ class AnswerActivity : AppCompatActivity() {
                         // intentで itemName, itemWhich, questionNum (ボタンのテキスト) を渡す
                         intentAnswerActivity.putExtra("itemName", intent.getStringExtra("itemName"))
                         intentAnswerActivity.putExtra("itemWhich", intent.getStringExtra("itemWhich"))
+                        intentAnswerActivity.putExtra("questionNum", intent.getStringExtra("questionNum"))
                         intentAnswerActivity.putExtra("selectedAnswer", selectedAnswer)
                         startActivity(intentAnswerActivity)
+                        finish()
                     }
                 }
             }

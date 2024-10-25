@@ -28,21 +28,21 @@ class nonlanguageActivity : AppCompatActivity() {
                 Log.d("TAG", "Document data: $data")
 
                 // ListViewオブジェクトを取得。
-                val lvGame = findViewById<ListView>(R.id.lvLanguage)
+                val lvGame = findViewById<ListView>(R.id.lvNonLanguage)
 
-                val ListData : MutableList<String> = mutableListOf()
+                val listData : MutableList<String> = mutableListOf()
 
                 if (data != null) {
                     for ((key, value) in data) {
-                        ListData.add(value.toString())
+                        listData.add(value.toString())
                     }
                 }
 
-                Log.d("TAG", "list data: $ListData")
+                Log.d("TAG", "list data: $listData")
                 // アダプタオブジェクトを生成。
                 val adapter = ArrayAdapter(this@nonlanguageActivity,
                     android.R.layout.simple_list_item_1,
-                    ListData // documentDataをそのまま渡す
+                    listData // documentDataをそのまま渡す
                 )
 
                 lvGame.adapter = adapter // アダプタをListViewに設定
@@ -83,6 +83,7 @@ class nonlanguageActivity : AppCompatActivity() {
             val item = parent.getItemAtPosition(position) as String
             val intent_select =  Intent(this@nonlanguageActivity,SelectActivity::class.java)
             intent_select.putExtra("itemName",item)
+            intent_select.putExtra("itemWhich","非言語")
             startActivity(intent_select)
         }
     }

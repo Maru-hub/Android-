@@ -14,12 +14,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import android.text.Html
 
 class ExplanationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_answer)
+        setContentView(R.layout.activity_explanation)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -37,27 +38,46 @@ class ExplanationActivity : AppCompatActivity() {
 
         val itemName = intent.getStringExtra("itemName")
         val itemWhich = intent.getStringExtra("itemWhich")
-        val buttonText = intent.getStringExtra("questionNum")
+        val questionNum = intent.getStringExtra("questionNum")
         val selectedAnswer = intent.getStringExtra("selectedAnswer")
+        val tvAnswer = findViewById<TextView>(R.id.youanswer)
+        tvAnswer.text = selectedAnswer.toString()
 
         val partRef = db.collection("$itemWhich").document("$itemName")
-        val questRef = partRef.collection("問題").document("$buttonText")
+        val questRef = partRef.collection("問題").document("$questionNum")
+        questRef.get().addOnSuccessListener { documentSnapshot ->
+            val docData = documentSnapshot.data
+            val AnswerStr = docData?.get("解説文") as String
+            Log.d(TAG, "DocumentSnapshot data: $AnswerStr")
+            val tvAnswer = findViewById<TextView>(R.id.textView30)
+            tvAnswer.text = Html.fromHtml(AnswerStr, Html.FROM_HTML_MODE_COMPACT)
+        }
         val choiRef = questRef.collection("選択肢").document("正解選択肢")
         choiRef.get().addOnSuccessListener { documentSnapshot ->
-            //documentはマップ？
-            val document = documentSnapshot.data
+            if (documentSnapshot != null) {
+                val docData = documentSnapshot.data
+                val correctAns = docData?.get("正解選択肢")
+                Log.d(TAG, "DocumentSnapshot data: $correctAns")
+                val tvCorrect = findViewById<TextView>(R.id.correctanswertext)
+                tvCorrect.text = correctAns.toString()
 
-            val yourAnswer = (document?.get(selectedAnswer))
-            val CorrectAnswer = (document?.get("正解選択肢"))
-            val tvAnswer = findViewById<TextView>(R.id.youanswer)
-            val tvCorrect = findViewById<TextView>(R.id.correctanswertext)
-            tvAnswer.text = yourAnswer.toString()
-            tvCorrect.text = CorrectAnswer.toString()
+                val TvSeigo = findViewById<TextView>(R.id.TvMaruBatu)
 
-            Log.d(TAG,"log document option Data: $document")
+                if (selectedAnswer == correctAns){
+                    TvSeigo.text = "〇"
+                }
+                else{
+                    TvSeigo.text = "×"
+                }
+            } else {
+                Log.d(TAG, "No such document")
+            }
         }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
+        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
+}
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 戻り値用の変数を初期値trueで用意
@@ -75,8 +95,6 @@ class ExplanationActivity : AppCompatActivity() {
         override fun onClick(view: View) {
             when(view.id){
                 R.id.bt_homeback -> {
-                    val finish = Intent(this@ExplanationActivity, SelectActivity::class.java)
-                    startActivity(finish)
                     finish()
                 }
             }

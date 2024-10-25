@@ -21,10 +21,10 @@ class examMainActivity : AppCompatActivity() {
         timerTextView = findViewById(R.id.timerTextView)
 
         // 5秒のカウントダウンタイマーを開始
-        object : CountDownTimer(5000, 1000) {
+        object : CountDownTimer(60, 1) {
             override fun onTick(millisUntilFinished: Long) {
                 // 残り時間を秒単位で計算
-                val secondsLeft = millisUntilFinished / 1000
+                val secondsLeft = millisUntilFinished
                 timerTextView.text = "残り時間: $secondsLeft 秒"
 
                 // 進捗を更新 (0から1の範囲)

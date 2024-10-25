@@ -84,17 +84,12 @@ class SelectActivity : AppCompatActivity() {
 
         val quesRef = db.collection("$itemWhich").document("$itemName")
         quesRef.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot != null && documentSnapshot.exists()) {
-                val questNum = documentSnapshot.getString("問題数")
-
-
+                val docData = documentSnapshot.data
+                val questNum = docData?.get("問題数") as String
                 Log.d(TAG, "questNum :$questNum")
-
                 if (questNum != null) {
                     addButton(questNum.toInt())
                 }
-            }
-
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
     }
