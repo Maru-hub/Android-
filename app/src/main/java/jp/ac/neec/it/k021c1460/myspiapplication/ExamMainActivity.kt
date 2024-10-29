@@ -17,7 +17,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 var currentQuestNum = 0
-class examMainActivity : AppCompatActivity() {
+class ExamMainActivity : AppCompatActivity() {
 
     private lateinit var circleProgressView: CircleProgressView
     private lateinit var timerTextView: TextView
@@ -123,7 +123,7 @@ class examMainActivity : AppCompatActivity() {
         //今の画面を終了した後新たな画面を作成
         finish()
         countDownTimer?.cancel()
-        val intent = Intent(this@examMainActivity, examMainActivity::class.java)
+        val intent = Intent(this@ExamMainActivity, ExamMainActivity::class.java)
         startActivity(intent)
     }
 
