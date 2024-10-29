@@ -68,11 +68,11 @@ class MainActivity : AppCompatActivity() {
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             when (view.id) {
-                /*// ログインボタンの場合
+                // ログインボタンの場合
                 R.id.btlogin -> {
-                    val intent2language = Intent(this@MainActivity, loginActivity::class.java)
+                    val intent2language = Intent(this@MainActivity, languageActivity::class.java)
                     startActivity(intent2language)
-                }*/
+                }
 
                 // 言語ボタンの場合
                 R.id.btlanguage -> {
