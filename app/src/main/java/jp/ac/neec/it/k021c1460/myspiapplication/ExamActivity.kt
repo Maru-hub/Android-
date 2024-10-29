@@ -7,7 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 
-class mockexamActivity : AppCompatActivity() {
+class ExamActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mockexam)
@@ -45,7 +45,7 @@ class mockexamActivity : AppCompatActivity() {
                     finish()
                 }
                 R.id.button -> {
-                    val intent2Teststart= Intent(this@mockexamActivity, examMainActivity::class.java)
+                    val intent2Teststart= Intent(this@ExamActivity, ExamMainActivity::class.java)
                     startActivity(intent2Teststart)
                 }
             }

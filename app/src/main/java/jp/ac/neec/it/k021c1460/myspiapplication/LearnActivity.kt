@@ -6,7 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 
-class learnActivity : AppCompatActivity() {
+class LearnActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_learn)

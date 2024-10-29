@@ -12,7 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MySPIApplication"
         tools:targetApi="31">
-
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
         <activity
             android:name=".ExplanationActivity"
             android:exported="false" />
@@ -35,19 +37,19 @@
             android:name=".FirstActivity"
             android:exported="false" />
         <activity
-            android:name=".examMainActivity"
+            android:name=".ExamMainActivity"
             android:exported="false" />
         <activity
-            android:name=".mockexamActivity"
+            android:name=".ExamActivity"
             android:exported="false" />
         <activity
-            android:name=".nonlanguageActivity"
+            android:name=".NonLanguageActivity"
             android:exported="false" />
         <activity
-            android:name=".languageActivity"
+            android:name=".LanguageActivity"
             android:exported="false" />
         <activity
-            android:name=".learnActivity"
+            android:name=".LearnActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

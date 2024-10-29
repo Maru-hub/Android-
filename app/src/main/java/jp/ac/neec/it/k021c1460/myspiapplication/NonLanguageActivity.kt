@@ -13,7 +13,7 @@ import android.widget.ListView
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
-class nonlanguageActivity : AppCompatActivity() {
+class NonLanguageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nonlanguage)
@@ -40,7 +40,7 @@ class nonlanguageActivity : AppCompatActivity() {
 
                 Log.d("TAG", "list data: $listData")
                 // アダプタオブジェクトを生成。
-                val adapter = ArrayAdapter(this@nonlanguageActivity,
+                val adapter = ArrayAdapter(this@NonLanguageActivity,
                     android.R.layout.simple_list_item_1,
                     listData // documentDataをそのまま渡す
                 )
@@ -81,7 +81,7 @@ class nonlanguageActivity : AppCompatActivity() {
     private inner class ListItemClickListener : AdapterView.OnItemClickListener{
         override fun onItemClick(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
             val item = parent.getItemAtPosition(position) as String
-            val intent_select =  Intent(this@nonlanguageActivity,SelectActivity::class.java)
+            val intent_select =  Intent(this@NonLanguageActivity,SelectActivity::class.java)
             intent_select.putExtra("itemName",item)
             intent_select.putExtra("itemWhich","非言語")
             startActivity(intent_select)
