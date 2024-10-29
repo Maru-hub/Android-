@@ -1,18 +1,12 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Display
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.SimpleAdapter
-import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +17,10 @@ class MainActivity : AppCompatActivity() {
         val btLanguage = findViewById<Button>(R.id.btlanguage)
         // リスナクラスのインスタンスを生成
         val listener = HelloListener()
+        // ログインボタンをであるButtonオブジェクトを取得
+        val btLogin = findViewById<Button>(R.id.btlogin)
+        // ログインボタンにリスナを設定
+        btLogin.setOnClickListener(listener)
         // 言語ボタンにリスナを設定
         btLanguage.setOnClickListener(listener)
         // 非言語ボタンであるButtonオブジェクトを取得
@@ -70,6 +68,12 @@ class MainActivity : AppCompatActivity() {
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             when (view.id) {
+                /*// ログインボタンの場合
+                R.id.btlogin -> {
+                    val intent2language = Intent(this@MainActivity, loginActivity::class.java)
+                    startActivity(intent2language)
+                }*/
+
                 // 言語ボタンの場合
                 R.id.btlanguage -> {
                     val intent2language = Intent(this@MainActivity, languageActivity::class.java)
