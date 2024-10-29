@@ -17,6 +17,10 @@ class MainActivity : AppCompatActivity() {
         val btLanguage = findViewById<Button>(R.id.btlanguage)
         // リスナクラスのインスタンスを生成
         val listener = HelloListener()
+        // ログインボタンをであるButtonオブジェクトを取得
+        val btLogin = findViewById<Button>(R.id.btlogin)
+        // ログインボタンにリスナを設定
+        btLogin.setOnClickListener(listener)
         // 言語ボタンにリスナを設定
         btLanguage.setOnClickListener(listener)
         // 非言語ボタンであるButtonオブジェクトを取得
@@ -64,24 +68,30 @@ class MainActivity : AppCompatActivity() {
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             when (view.id) {
+                /*// ログインボタンの場合
+                R.id.btlogin -> {
+                    val intent2language = Intent(this@MainActivity, loginActivity::class.java)
+                    startActivity(intent2language)
+                }*/
+
                 // 言語ボタンの場合
                 R.id.btlanguage -> {
-                    val intent2language = Intent(this@MainActivity, LanguageActivity::class.java)
+                    val intent2language = Intent(this@MainActivity, languageActivity::class.java)
                     startActivity(intent2language)
                 }
                 // 非言語ボタンの場合
                 R.id.btnonlanguage -> {
-                    val intent2nonlanguage = Intent(this@MainActivity, NonLanguageActivity::class.java)
+                    val intent2nonlanguage = Intent(this@MainActivity, nonlanguageActivity::class.java)
                     startActivity(intent2nonlanguage)
                 }
                 // 模試試験ボタンの場合
                 R.id.btmocktest -> {
-                    val intent2mocktest = Intent(this@MainActivity, ExamActivity::class.java)
+                    val intent2mocktest = Intent(this@MainActivity, mockexamActivity::class.java)
                     startActivity(intent2mocktest)
                 }
                 // 学習状況ボタンの場合
                 R.id.btresult -> {
-                    val intent2learn = Intent(this@MainActivity, LearnActivity::class.java)
+                    val intent2learn = Intent(this@MainActivity, learnActivity::class.java)
                     startActivity(intent2learn)
                 }
             }
