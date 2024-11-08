@@ -15,6 +15,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import android.text.Html
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 
 class ExplanationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,14 +63,28 @@ class ExplanationActivity : AppCompatActivity() {
                 val tvCorrect = findViewById<TextView>(R.id.correctanswertext)
                 tvCorrect.text = correctAns.toString()
 
+                val auth = com.google.firebase.ktx.Firebase.auth
+                val user = auth.currentUser
+                val userId = user?.uid
+
+                val db = com.google.firebase.ktx.Firebase.firestore
+                val userRef = db.collection("users").document("$userId")
+                val partRef = userRef.collection("$itemWhich").document("$itemName")
+                val questRef = partRef.collection("問題").document("$questionNum")
+
                 val TvSeigo = findViewById<TextView>(R.id.TvMaruBatu)
 
                 if (selectedAnswer == correctAns){
                     TvSeigo.text = "〇"
+                    val data = hashMapOf("ユーザーの正誤" to "〇")
+                    questRef.set(data)
                 }
                 else{
                     TvSeigo.text = "×"
+                    val data = hashMapOf("ユーザーの正誤" to "×")
+                    questRef.set(data)
                 }
+
             } else {
                 Log.d(TAG, "No such document")
             }

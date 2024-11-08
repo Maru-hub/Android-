@@ -17,9 +17,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.ktx.firestore
 
 class AnswerActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,7 +32,9 @@ class AnswerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        val itemName = intent.getStringExtra("itemName")
+        val itemWhich = intent.getStringExtra("itemWhich")
+        val buttonText = intent.getStringExtra("questionNum")
         // ホームボタンであるButtonオブジェクトを取得
         val btNext = findViewById<Button>(R.id.bt_nextbottn)
         // リスナクラスのインスタンスを生成
@@ -39,9 +44,8 @@ class AnswerActivity : AppCompatActivity() {
 
         val db = Firebase.firestore
 
-        val itemName = intent.getStringExtra("itemName")
-        val itemWhich = intent.getStringExtra("itemWhich")
-        val buttonText = intent.getStringExtra("questionNum")
+
+
         val RgOpt = findViewById<RadioGroup>(R.id.radioGroup)
 
         val partRef = db.collection("$itemWhich").document("$itemName")
@@ -108,9 +112,11 @@ class AnswerActivity : AppCompatActivity() {
             val RgOpt = findViewById<RadioGroup>(R.id.radioGroup)
             when (view.id) {
                 R.id.bt_nextbottn -> {
+
                     // ラジオグループから選択されたボタンのIDを取得
                     val selectedRadioButtonId = RgOpt.checkedRadioButtonId
                     if (selectedRadioButtonId != -1) {
+
                         // 選択されたラジオボタンを取得
                         val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
                         val selectedAnswer = selectedRadioButton.text.toString()

@@ -15,11 +15,6 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 
 var currentQuestNum = 0
