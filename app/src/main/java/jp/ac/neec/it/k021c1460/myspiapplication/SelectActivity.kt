@@ -84,10 +84,24 @@ class SelectActivity : AppCompatActivity() {
 
         val quesRef = db.collection("$itemWhich").document("$itemName")
         quesRef.get().addOnSuccessListener { documentSnapshot ->
-                val docData = documentSnapshot.data
+            val docData = documentSnapshot.data
+            if (docData != null) {
+                /*
+                for (i in docData.values){
+                    val stateRef = quesRef.collection("問題").document("問題"+i)
+                    stateRef.get().addOnSuccessListener { documentSnapshot ->
+                        val docData = documentSnapshot.data
+                        if (docData != null) {
+                            if (docData.values.toString() != "")
+                                quesRef.set("問題数" to "$i")
+                        }
+                    }
+                }
+                 */
+            }
                 val questNum = docData?.get("問題数") as String
                 Log.d(TAG, "questNum :$questNum")
-                if (questNum != null) {
+                if (questNum != null && questNum != "") {
                     addButton(questNum.toInt())
                 }
             supportActionBar?.setDisplayHomeAsUpEnabled(true)

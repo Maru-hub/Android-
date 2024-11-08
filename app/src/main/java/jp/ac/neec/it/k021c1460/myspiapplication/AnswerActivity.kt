@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.text.Html
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
@@ -53,8 +54,8 @@ class AnswerActivity : AppCompatActivity() {
 
             val tvState = findViewById<TextView>(R.id.statement)
             val tvQuest = findViewById<TextView>(R.id.question)
-            tvState.text = statement.toString()
-            tvQuest.text = question.toString()
+            tvState.text = Html.fromHtml(statement.toString(), Html.FROM_HTML_MODE_COMPACT)
+            tvQuest.text = Html.fromHtml(question.toString(), Html.FROM_HTML_MODE_COMPACT)
             //val keys = document?.keys
             Log.d(TAG,"log document Data: $docData")
         }

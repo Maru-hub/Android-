@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +74,6 @@ class MainActivity : AppCompatActivity() {
                     val intent2language = Intent(this@MainActivity, LoginActivity::class.java)
                     startActivity(intent2language)
                 }
-
                 // 言語ボタンの場合
                 R.id.btlanguage -> {
                     val intent2language = Intent(this@MainActivity, LanguageActivity::class.java)

@@ -16,6 +16,12 @@ import android.widget.TextView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.ktx.auth
+
 var currentQuestNum = 0
 class ExamMainActivity : AppCompatActivity() {
 
@@ -55,6 +61,9 @@ class ExamMainActivity : AppCompatActivity() {
             }
             else{
                 //問題がデータベースにない(全問出題し終わった)時の処理をここに書く
+                finish()
+                val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+                startActivity(intent)
             }
         }
 
@@ -120,9 +129,28 @@ class ExamMainActivity : AppCompatActivity() {
 
     // 次の画面に遷移するメソッド
     private fun moveToNextScreen() {
+        val auth = Firebase.auth
+        val user = auth.currentUser
+        val userId = user?.uid
+
+        val db = Firebase.firestore
+        val examRef = db.collection("users").document("$userId").
+        collection("模擬試験").document("問題$currentQuestNum")
+
+        // RadioGroupから選択されたラジオボタンのテキストを取得
+        val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)  // RadioGroupのIDを指定
+        val selectedRadioButtonId = radioGroup.checkedRadioButtonId
+
+        // 選択されたRadioButtonが存在する場合
+        if (selectedRadioButtonId != -1) {
+            val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+            val selectedText = selectedRadioButton.text.toString()  // 選択されたラジオボタンのテキストを取得
+            Log.d("SelectedAnswer", "選択された回答: $selectedText")
+            val data = hashMapOf("ユーザーの解答" to selectedText)
+            examRef.set(data)
+        }
         //今の画面を終了した後新たな画面を作成
         finish()
-        countDownTimer?.cancel()
         val intent = Intent(this@ExamMainActivity, ExamMainActivity::class.java)
         startActivity(intent)
     }
@@ -140,7 +168,7 @@ class ExamMainActivity : AppCompatActivity() {
         return returnVal
     }
 
-    //戻るボタンをタップした時の処理。
+    //ボタンをタップした時の処理。
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
             when(view.id){
