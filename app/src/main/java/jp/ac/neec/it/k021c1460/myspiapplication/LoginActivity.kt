@@ -1,7 +1,6 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -120,7 +119,7 @@ class LoginActivity : AppCompatActivity() {
                         Log.d(TAG, "createUserWithEmail:success")
                         val user = auth.currentUser
                         val userId = user?.uid.toString()
-                        val userName = user?.displayName.toString()
+                        val userName = user?.email?.split("@")?.get(0) ?: ""
                         val data = hashMapOf("name" to "$userName")
                         db.collection("users").document(userId).set(data) // userId = uid
                         updateUI(user)

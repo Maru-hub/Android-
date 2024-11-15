@@ -3,7 +3,6 @@ package jp.ac.neec.it.k021c1460.myspiapplication
 import android.os.Bundle
 import android.util.Log
 import android.content.ContentValues.TAG
-import android.content.Intent
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
@@ -16,7 +15,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import android.text.Html
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.SetOptions
 
 class ExplanationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,24 +28,33 @@ class ExplanationActivity : AppCompatActivity() {
             insets
         }
 
-        // ホームボタンであるButtonオブジェクトを取得
+        //　オブジェクトを取得
         val btHomeBack = findViewById<Button>(R.id.bt_homeback)
+        val TvSeigo = findViewById<TextView>(R.id.TvMaruBatu)
+        val tvCorrect = findViewById<TextView>(R.id.correctanswertext)
         // リスナクラスのインスタンスを生成
         val listener = HelloListener()
         // 最初の画面に戻るボタンにリスナを設定
         btHomeBack.setOnClickListener(listener)
-
-        val db = Firebase.firestore
-
+        //bundle 取得
         val itemName = intent.getStringExtra("itemName")
         val itemWhich = intent.getStringExtra("itemWhich")
         val questionNum = intent.getStringExtra("questionNum")
         val selectedAnswer = intent.getStringExtra("selectedAnswer")
         val tvAnswer = findViewById<TextView>(R.id.youanswer)
         tvAnswer.text = selectedAnswer.toString()
-
+        //firevase auth
+        val auth = com.google.firebase.ktx.Firebase.auth
+        val user = auth.currentUser
+        val userId = user?.uid
+        //firestoreの参照
+        val db = Firebase.firestore
         val partRef = db.collection("$itemWhich").document("$itemName")
         val questRef = partRef.collection("問題").document("$questionNum")
+        val userRef = db.collection("users").document("$userId")
+        val userPartRef = userRef.collection("$itemWhich").document("$itemName")
+        val choiRef = questRef.collection("選択肢").document("正解選択肢")
+
         questRef.get().addOnSuccessListener { documentSnapshot ->
             val docData = documentSnapshot.data
             val AnswerStr = docData?.get("解説文") as String
@@ -54,47 +62,68 @@ class ExplanationActivity : AppCompatActivity() {
             val tvAnswer = findViewById<TextView>(R.id.textView30)
             tvAnswer.text = Html.fromHtml(AnswerStr, Html.FROM_HTML_MODE_COMPACT)
         }
-        val choiRef = questRef.collection("選択肢").document("正解選択肢")
+
+        //問題数を取得
+        fun achRate(answered: Int, total: Int): Int {
+            return (answered / total * 100)
+        }
+
+        partRef.get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot != null){
+                val docData = documentSnapshot.data
+                val listCount = docData?.count()
+                Log.d("answered","answered is $listCount")
+            }
+        }
+
+        //答え合わせ
         choiRef.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot != null) {
                 val docData = documentSnapshot.data
                 val correctAns = docData?.get("正解選択肢")
-                Log.d(TAG, "DocumentSnapshot data: $correctAns")
-                val tvCorrect = findViewById<TextView>(R.id.correctanswertext)
+                Log.d(TAG, "正解: $correctAns")
                 tvCorrect.text = correctAns.toString()
-
-                val auth = com.google.firebase.ktx.Firebase.auth
-                val user = auth.currentUser
-                val userId = user?.uid
-
-                val db = com.google.firebase.ktx.Firebase.firestore
-                val userRef = db.collection("users").document("$userId")
-                val partRef = userRef.collection("$itemWhich").document("$itemName")
-                val questRef = partRef.collection("問題").document("$questionNum")
-
-                val TvSeigo = findViewById<TextView>(R.id.TvMaruBatu)
 
                 if (selectedAnswer == correctAns){
                     TvSeigo.text = "〇"
-                    val data = hashMapOf("ユーザーの正誤" to "〇")
-                    questRef.set(data)
+                    val data = hashMapOf("$questionNum" to "〇")
+                    userPartRef.set(data, SetOptions.merge())
                 }
                 else{
                     TvSeigo.text = "×"
-                    val data = hashMapOf("ユーザーの正誤" to "×")
-                    questRef.set(data)
+                    val data = hashMapOf("$questionNum" to "×")
+                    userPartRef.set(data, SetOptions.merge())
+                }
+
+                //解答数をデータベースに追加
+                userPartRef.get().addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot != null){
+                        val docData = documentSnapshot.data
+                        val listCount = docData?.count() as Int
+                        Log.d("answered","answered is $listCount")
+                        partRef.get().addOnSuccessListener { documentSnapshot2 ->
+                            if (documentSnapshot2 != null){
+                                val docData2 = documentSnapshot2.getString("問題数")
+                                val docDataInt = docData2!!.toInt()
+                                val setData = hashMapOf("達成率" to achRate(listCount,docDataInt).toString())
+                                Log.d("","$setData")
+                                userPartRef.set(setData, SetOptions.merge())
+                            }
+                        }
+                    }
                 }
 
             } else {
                 Log.d(TAG, "No such document")
             }
+
         }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)
             }
         //supportActionBar?.setDisplayHomeAsUpEnabled(true)
-}
 
+    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 戻り値用の変数を初期値trueで用意
         var returnVal = true
