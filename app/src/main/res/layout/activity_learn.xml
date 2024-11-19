@@ -140,19 +140,19 @@
 
         <RadioButton
             android:checked="true"
-            android:id="@+id/radioButton"
+            android:id="@+id/learnRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="言語" />
 
         <RadioButton
-            android:id="@+id/radioButton2"
+            android:id="@+id/learnRadioButton2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="非言語" />
 
         <RadioButton
-            android:id="@+id/radioButton3"
+            android:id="@+id/learnRadioButton3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

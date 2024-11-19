@@ -84,28 +84,16 @@ class SelectActivity : AppCompatActivity() {
 
         val quesRef = db.collection("$itemWhich").document("$itemName")
         quesRef.get().addOnSuccessListener { documentSnapshot ->
-            val docData = documentSnapshot.data
-            if (docData != null) {
-                /*
-                for (i in docData.values){
-                    val stateRef = quesRef.collection("問題").document("問題"+i)
-                    stateRef.get().addOnSuccessListener { documentSnapshot ->
-                        val docData = documentSnapshot.data
-                        if (docData != null) {
-                            if (docData.values.toString() != "")
-                                quesRef.set("問題数" to "$i")
-                        }
-                    }
-                }
-                 */
-            }
+            if (documentSnapshot != null){
+                val docData = documentSnapshot.data
                 val questNum = docData?.get("問題数") as String
                 Log.d(TAG, "questNum :$questNum")
                 if (questNum != null && questNum != "") {
                     addButton(questNum.toInt())
                 }
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
         }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 戻り値用の変数を初期値trueで用意

@@ -19,43 +19,30 @@ class NonLanguageActivity : AppCompatActivity() {
         setContentView(R.layout.activity_nonlanguage)
 
         val db = Firebase.firestore
-
-        val docRef = db.collection("非言語").document("項目")
-        docRef.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot.exists()) {
-                // ドキュメントデータを取得
-                val data = documentSnapshot.data
-                Log.d("TAG", "Document data: $data")
+        val languageRef = db.collection("非言語")
+        languageRef.get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot != null){
+                val list: MutableList<String> = mutableListOf()
+                for (document in documentSnapshot){
+                    list.add(document.id)
+                    Log.d("","$list")
+                }
 
                 // ListViewオブジェクトを取得。
                 val lvGame = findViewById<ListView>(R.id.lvNonLanguage)
 
-                val listData : MutableList<String> = mutableListOf()
-
-                if (data != null) {
-                    for ((key, value) in data) {
-                        listData.add(value.toString())
-                    }
-                }
-
-                Log.d("TAG", "list data: $listData")
                 // アダプタオブジェクトを生成。
                 val adapter = ArrayAdapter(this@NonLanguageActivity,
                     android.R.layout.simple_list_item_1,
-                    listData // documentDataをそのまま渡す
+                    list// documentDataをそのまま渡す
                 )
-
                 lvGame.adapter = adapter // アダプタをListViewに設定
 
                 //リストビューにリスナを設定。
                 lvGame.onItemClickListener = ListItemClickListener()
-            } else {
-                Log.d("TAG", "No such document")
             }
         }
-            .addOnFailureListener { exception ->
-                Log.w("TAG", "Error getting document", exception)
-            }
+
         // ホームボタンであるButtonオブジェクトを取得
         val btBack = findViewById<Button>(R.id.bthome2)
         // リスナクラスのインスタンスを生成

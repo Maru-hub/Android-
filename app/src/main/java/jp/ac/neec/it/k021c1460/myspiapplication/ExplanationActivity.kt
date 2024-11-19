@@ -41,9 +41,10 @@ class ExplanationActivity : AppCompatActivity() {
         val itemWhich = intent.getStringExtra("itemWhich")
         val questionNum = intent.getStringExtra("questionNum")
         val selectedAnswer = intent.getStringExtra("selectedAnswer")
+
         val tvAnswer = findViewById<TextView>(R.id.youanswer)
         tvAnswer.text = selectedAnswer.toString()
-        //firevase auth
+        //firebaseユーザー
         val auth = com.google.firebase.ktx.Firebase.auth
         val user = auth.currentUser
         val userId = user?.uid
@@ -64,8 +65,11 @@ class ExplanationActivity : AppCompatActivity() {
         }
 
         //問題数を取得
-        fun achRate(answered: Int, total: Int): Int {
-            return (answered / total * 100)
+        fun achRate(answered: Int, total: Int): String {
+            val num = (answered.toDouble() / total.toDouble() * 100)
+            Log.d("","achievement :$answered : $total : $num")
+            val returnVar = "${answered-1} / $total"
+            return returnVar
         }
 
         partRef.get().addOnSuccessListener { documentSnapshot ->
@@ -95,23 +99,6 @@ class ExplanationActivity : AppCompatActivity() {
                     userPartRef.set(data, SetOptions.merge())
                 }
 
-                //解答数をデータベースに追加
-                userPartRef.get().addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot != null){
-                        val docData = documentSnapshot.data
-                        val listCount = docData?.count() as Int
-                        Log.d("answered","answered is $listCount")
-                        partRef.get().addOnSuccessListener { documentSnapshot2 ->
-                            if (documentSnapshot2 != null){
-                                val docData2 = documentSnapshot2.getString("問題数")
-                                val docDataInt = docData2!!.toInt()
-                                val setData = hashMapOf("達成率" to achRate(listCount,docDataInt).toString())
-                                Log.d("","$setData")
-                                userPartRef.set(setData, SetOptions.merge())
-                            }
-                        }
-                    }
-                }
 
             } else {
                 Log.d(TAG, "No such document")

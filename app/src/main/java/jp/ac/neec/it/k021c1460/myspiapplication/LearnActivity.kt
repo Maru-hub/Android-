@@ -5,16 +5,20 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ListView
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.TextView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 
 
 class LearnActivity : AppCompatActivity() {
-    var partCount = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_learn)
@@ -28,24 +32,92 @@ class LearnActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        val db = Firebase.firestore
+
         val radioGroup = findViewById<RadioGroup>(R.id.learnRadioGroup)
         val checkedBt = radioGroup.checkedRadioButtonId
         val selectedRadioBt = findViewById<RadioButton>(checkedBt)
         val selectedBtText = selectedRadioBt.text.toString()
 
-        if (checkedBt != -1){
-            when(selectedBtText){
-                "言語" ->{
-                    Log.d("radio checked","radio checked $selectedBtText")
+        //firebaseユーザー
+        val auth = com.google.firebase.ktx.Firebase.auth
+        val user = auth.currentUser
+        val userId = user?.uid
+        //bundle 取得
+        val itemName = intent.getStringExtra("itemName")
+        val itemWhich = intent.getStringExtra("itemWhich")
+        val questionNum = intent.getStringExtra("questionNum")
+        val selectedAnswer = intent.getStringExtra("selectedAnswer")
+        //firestore参照
+        val partRef = db.collection("$itemWhich").document("$itemName")
+        val questRef = partRef.collection("問題").document("$questionNum")
+        val userRef = db.collection("users").document("$userId")
+        val userPartRef = userRef.collection("$itemWhich").document("$itemName")
+        val choiRef = questRef.collection("選択肢").document("正解選択肢")
+        //画面部品
+        val TvAchievement = findViewById<TextView>(R.id.tvrate)
+
+        //言語、非言語の総問題数を数える
+        fun count(toUserCount : Boolean,itemName: String){
+            var totalQuestNum = 0
+            var userTotalQuestNum = 0
+            val languageRef = db.collection("$itemName")
+            val userLanguageRef = db.collection("users").document("$userId")
+                .collection("$itemName")
+            //get
+            if (toUserCount){
+                userLanguageRef.get().addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot != null) {
+                        val list: MutableList<String> = mutableListOf()
+                        for (document in documentSnapshot) {
+                            list.add(document.id)
+                        }
+                        for (element in list) {
+                            val quesNumRef = userLanguageRef.document("$element")
+                            //get
+                            quesNumRef.get().addOnSuccessListener { documentSnapshot ->
+                                if (documentSnapshot != null) {
+                                    val docDataSize = documentSnapshot.data?.size
+                                    userTotalQuestNum = userTotalQuestNum + docDataSize!!.toInt()
+                                    Log.d("", "ユーザーの$element の問題数は $docDataSize 問です。")
+                                    Log.d("", "userTotalQuestNum = $userTotalQuestNum")
+                                    userRef.update(itemName+"解答数",userTotalQuestNum)
+                                }
+                            }
+
+                        }
+
+                    }
                 }
-                "非言語" ->{
-                    Log.d("radio checked","radio checked $selectedBtText")
-                }
-                "模擬試験" ->{
-                    Log.d("radio checked","radio checked $selectedBtText")
+            }else{
+                languageRef.get().addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot != null) {
+                        val list: MutableList<String> = mutableListOf()
+                        for (document in documentSnapshot) {
+                            list.add(document.id)
+                        }
+                        for (element in list) {
+                            val quesNumRef = languageRef.document("$element")
+                            //get
+                            quesNumRef.get().addOnSuccessListener { documentSnapshot ->
+                                if (documentSnapshot != null) {
+                                    val docData = documentSnapshot.getString("問題数")
+                                    totalQuestNum = totalQuestNum + docData!!.toInt()
+                                    Log.d("", "$element の問題数は $docData 問です。"
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
+            //val displayRate = userTotalQuestNum.toDouble() / totalQuestNum * 100
+            TvAchievement.text = "$userTotalQuestNum / $totalQuestNum"
         }
+
+        //最初は言語の学習状況を表示(初期設定で言語が最初に選択されている)
+        count(false,"言語")
+        count(true,"言語")
 
         radioGroup.setOnCheckedChangeListener { group, selected ->
             val radioGroup = findViewById<RadioGroup>(R.id.learnRadioGroup)
@@ -53,24 +125,28 @@ class LearnActivity : AppCompatActivity() {
             val selectedRadioBt = findViewById<RadioButton>(checkedBt)
             val selectedBtText = selectedRadioBt.text.toString()
             Log.d("radio checked", "radio checked $selectedBtText")
+            //リスナが反応したら押下ボタン判定
+            when (selected) {
+                R.id.learnRadioButton -> {
+                    Log.d("radio checked", "radio checked $selectedBtText")
+                    count(false,"言語")
+                    count(true,"言語")
 
-            //合計問題数とカレントユーザーの解答数を取得
-            val db = Firebase.firestore
+                }
 
-            val partRef = db.collection("合計問題数").document("$selectedBtText")
-            partRef.get().addOnSuccessListener { documentSnapshot ->
-             if (documentSnapshot != null){
-                 val docData = documentSnapshot.getString("合計問題数")
-             }
+                R.id.learnRadioButton2 -> {
+                    Log.d("radio checked", "radio checked $selectedBtText")
+                    count(false,"非言語")
+                    count(true,"非言語")
+                }
+
+                R.id.learnRadioButton3 -> {
+                    Log.d("radio checked", "radio checked $selectedBtText")
+                }
             }
-
-            val user = Firebase.auth
-            val currentUser = user.currentUser
-            val userId = currentUser?.uid
-            val userAnsRef = db.collection("users").document("$userId")
-            //val secondRef = userAnsRef.
         }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 戻り値用の変数を初期値trueで用意

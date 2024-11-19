@@ -20,40 +20,29 @@ class LanguageActivity : AppCompatActivity() {
 
         val db = Firebase.firestore
 
-        val docRef = db.collection("言語").document("項目")
-        docRef.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot.exists()) {
-                // ドキュメントデータを取得
-                val data = documentSnapshot.data
-                Log.d("TAG", "Document data: $data")
+        val languageRef = db.collection("言語")
+        languageRef.get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot != null){
+                val list: MutableList<String> = mutableListOf()
+                for (document in documentSnapshot){
+                    list.add(document.id)
+                    Log.d("","$list")
+                }
 
                 // ListViewオブジェクトを取得。
                 val lvGame = findViewById<ListView>(R.id.lvLanguage)
 
-                val ListData : MutableList<String> = mutableListOf()
-                 if (data != null) {
-                     for ((key, value) in data) {
-                         ListData.add(value.toString())
-                     }
-                 }
-                Log.d("TAG", "list data: $ListData")
                 // アダプタオブジェクトを生成。
                 val adapter = ArrayAdapter(this@LanguageActivity,
                     android.R.layout.simple_list_item_1,
-                    ListData // documentDataをそのまま渡す
+                    list// documentDataをそのまま渡す
                 )
                 lvGame.adapter = adapter // アダプタをListViewに設定
 
                 //リストビューにリスナを設定。
                 lvGame.onItemClickListener = ListItemClickListener()
-            } else {
-                Log.d("TAG", "No such document")
             }
         }
-            .addOnFailureListener { exception ->
-                Log.w("TAG", "Error getting document", exception)
-            }
-
         // ホームボタンであるButtonオブジェクトを取得
         val btBack = findViewById<Button>(R.id.btHome1)
         // リスナクラスのインスタンスを生成
