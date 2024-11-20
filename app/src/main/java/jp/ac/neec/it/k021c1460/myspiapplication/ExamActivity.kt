@@ -55,6 +55,6 @@ class ExamActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //この画面が再表示されたら模試の問題数をリセット
-        currentQuestNum = 0
+        currentQuestNum = 29
     }
 }

@@ -24,6 +24,13 @@ class ExamMainActivity : AppCompatActivity() {
     private lateinit var timerTextView: TextView
     private var countDownTimer: CountDownTimer? = null  // タイマーを保持する変数
 
+    //ユーザー認証
+    val auth = Firebase.auth
+    val user = auth.currentUser
+    val userId = user?.uid
+    //firebase
+    val db = Firebase.firestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam_main)
@@ -31,7 +38,6 @@ class ExamMainActivity : AppCompatActivity() {
         currentQuestNum += 1
         val RgOpt = findViewById<RadioGroup>(R.id.examRadioGroup)
 
-        val db = Firebase.firestore
         val examQuestNum = currentQuestNum
         Log.d(TAG,"examQuestNum = $examQuestNum")
 
@@ -107,7 +113,7 @@ class ExamMainActivity : AppCompatActivity() {
     // カウントダウンタイマーの開始メソッド
     private fun startCountDownTimer() {
         // 5秒のカウントダウンタイマーを開始
-        countDownTimer = object : CountDownTimer(5000, 1000) {
+        countDownTimer = object : CountDownTimer(2000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
                 timerTextView.text = "残り時間: $secondsLeft 秒"
@@ -124,11 +130,7 @@ class ExamMainActivity : AppCompatActivity() {
 
     // 次の画面に遷移するメソッド
     private fun moveToNextScreen() {
-        val auth = Firebase.auth
-        val user = auth.currentUser
-        val userId = user?.uid
 
-        val db = Firebase.firestore
         val examRef = db.collection("users").document("$userId").
         collection("模擬試験").document("問題$currentQuestNum")
 

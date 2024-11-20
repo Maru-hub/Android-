@@ -23,14 +23,7 @@ class LearnActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_learn)
 
-        // ホームボタンであるButtonオブジェクトを取得
-        val btBack = findViewById<Button>(R.id.bthome4)
-        // リスナクラスのインスタンスを生成
-        val listener = HelloListener()
-        // 最初の画面に戻るボタンにリスナを設定
-        btBack.setOnClickListener(listener)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val db = Firebase.firestore
 
@@ -55,12 +48,23 @@ class LearnActivity : AppCompatActivity() {
         val userPartRef = userRef.collection("$itemWhich").document("$itemName")
         val choiRef = questRef.collection("選択肢").document("正解選択肢")
         //画面部品
-        val TvAchievement = findViewById<TextView>(R.id.tvrate)
+        val tvAchieveRate = findViewById<TextView>(R.id.tvAchieveRate)
+        val tvCorrectAnsRate = findViewById<TextView>(R.id.tvCorrectAnsRate)
+        val btBack = findViewById<Button>(R.id.bthome4)// ホームボタン
+        // リスナクラスのインスタンスを生成
+        val listener = HelloListener()
+        // 最初の画面に戻るボタンにリスナを設定
+        btBack.setOnClickListener(listener)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         //言語、非言語の総問題数を数える
         fun count(toUserCount : Boolean,itemName: String){
+            //変数定義
             var totalQuestNum = 0
             var userTotalQuestNum = 0
+            var userCorrectNum = 0
+
             val languageRef = db.collection("$itemName")
             val userLanguageRef = db.collection("users").document("$userId")
                 .collection("$itemName")
@@ -77,16 +81,26 @@ class LearnActivity : AppCompatActivity() {
                             //get
                             quesNumRef.get().addOnSuccessListener { documentSnapshot ->
                                 if (documentSnapshot != null) {
-                                    val docDataSize = documentSnapshot.data?.size
+                                    val docData = documentSnapshot.data
+                                    Log.d("","$docData")
+                                    val docDataSize = docData?.size
+
+                                    if (docData != null) {
+                                        for (questElement in docData){
+                                            val isCircle = questElement.value
+                                            if (isCircle == "〇"){
+                                                userCorrectNum = userCorrectNum + 1
+                                            }
+                                        }
+                                    }
                                     userTotalQuestNum = userTotalQuestNum + docDataSize!!.toInt()
                                     Log.d("", "ユーザーの$element の問題数は $docDataSize 問です。")
                                     Log.d("", "userTotalQuestNum = $userTotalQuestNum")
                                     userRef.update(itemName+"解答数",userTotalQuestNum)
+                                    userRef.update(itemName+"正解数",userCorrectNum)
                                 }
                             }
-
                         }
-
                     }
                 }
             }else{
@@ -103,21 +117,45 @@ class LearnActivity : AppCompatActivity() {
                                 if (documentSnapshot != null) {
                                     val docData = documentSnapshot.getString("問題数")
                                     totalQuestNum = totalQuestNum + docData!!.toInt()
-                                    Log.d("", "$element の問題数は $docData 問です。"
-                                    )
+                                    Log.d("", "$element の問題数は $docData 問です。")
                                 }
                             }
                         }
                     }
                 }
             }
-            //val displayRate = userTotalQuestNum.toDouble() / totalQuestNum * 100
-            TvAchievement.text = "$userTotalQuestNum / $totalQuestNum"
         }
+        fun display (language : String){
+            if (user != null){
+                userRef.get().addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot != null){
+                        var userAns = documentSnapshot.get(language+"解答数")
+                        var userCorrect = documentSnapshot.get(language+"正解数")
+                        userAns = userAns as? Double
+                        userCorrect = userCorrect as? Double
 
-        //最初は言語の学習状況を表示(初期設定で言語が最初に選択されている)
+                        val totalRef = db.collection("合計問題数").document(language)
+                        totalRef.get().addOnSuccessListener { documentSnapshot2 ->
+                            if (documentSnapshot2 != null){
+                                var totalQuest = documentSnapshot2.get("合計問題数")
+                                totalQuest = totalQuest as? Double
+                                if (userAns != null || userCorrect != null || totalQuest != null){
+                                    tvAchieveRate.text = "${(userAns!! / totalQuest!!)*100}%"
+                                    tvCorrectAnsRate.text = "${(userCorrect!! / userAns!!)*100}%"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //最初にユーザーデータを更新
         count(false,"言語")
         count(true,"言語")
+        count(false,"非言語")
+        count(true,"非言語")
+        //最初は言語を表示
+        display("言語")
 
         radioGroup.setOnCheckedChangeListener { group, selected ->
             val radioGroup = findViewById<RadioGroup>(R.id.learnRadioGroup)
@@ -129,19 +167,17 @@ class LearnActivity : AppCompatActivity() {
             when (selected) {
                 R.id.learnRadioButton -> {
                     Log.d("radio checked", "radio checked $selectedBtText")
-                    count(false,"言語")
-                    count(true,"言語")
-
+                    display("言語")
                 }
 
                 R.id.learnRadioButton2 -> {
                     Log.d("radio checked", "radio checked $selectedBtText")
-                    count(false,"非言語")
-                    count(true,"非言語")
+                    display("非言語")
                 }
 
                 R.id.learnRadioButton3 -> {
                     Log.d("radio checked", "radio checked $selectedBtText")
+                    //display("模擬試験")
                 }
             }
         }
