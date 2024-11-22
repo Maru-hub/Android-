@@ -23,8 +23,6 @@ class LearnActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_learn)
 
-
-
         val db = Firebase.firestore
 
         val radioGroup = findViewById<RadioGroup>(R.id.learnRadioGroup)
@@ -41,6 +39,8 @@ class LearnActivity : AppCompatActivity() {
         val itemWhich = intent.getStringExtra("itemWhich")
         val questionNum = intent.getStringExtra("questionNum")
         val selectedAnswer = intent.getStringExtra("selectedAnswer")
+        val fromExamMain = intent.getStringExtra("fromExamMain")
+
         //firestore参照
         val partRef = db.collection("$itemWhich").document("$itemName")
         val questRef = partRef.collection("問題").document("$questionNum")
@@ -51,12 +51,18 @@ class LearnActivity : AppCompatActivity() {
         val tvAchieveRate = findViewById<TextView>(R.id.tvAchieveRate)
         val tvCorrectAnsRate = findViewById<TextView>(R.id.tvCorrectAnsRate)
         val btBack = findViewById<Button>(R.id.bthome4)// ホームボタン
+        val rtExam = findViewById<RadioButton>(R.id.learnRadioButton3)
         // リスナクラスのインスタンスを生成
         val listener = HelloListener()
         // 最初の画面に戻るボタンにリスナを設定
         btBack.setOnClickListener(listener)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        //模擬試験画面からの遷移の場合選択
+        if(fromExamMain == "模擬試験"){
+            rtExam.isChecked = true
+        }
 
         //言語、非言語の総問題数を数える
         fun count(toUserCount : Boolean,itemName: String){
@@ -96,8 +102,9 @@ class LearnActivity : AppCompatActivity() {
                                     userTotalQuestNum = userTotalQuestNum + docDataSize!!.toInt()
                                     Log.d("", "ユーザーの$element の問題数は $docDataSize 問です。")
                                     Log.d("", "userTotalQuestNum = $userTotalQuestNum")
-                                    userRef.update(itemName+"解答数",userTotalQuestNum)
-                                    userRef.update(itemName+"正解数",userCorrectNum)
+                                    Log.d("", "userTotalQuestNum = $userCorrectNum")
+                                    userRef.set(hashMapOf( itemName+"解答数" to userTotalQuestNum ), SetOptions.merge())
+                                    userRef.set(hashMapOf( itemName+"正解数" to userCorrectNum ), SetOptions.merge())
                                 }
                             }
                         }
@@ -105,19 +112,26 @@ class LearnActivity : AppCompatActivity() {
                 }
             }else{
                 languageRef.get().addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot != null) {
-                        val list: MutableList<String> = mutableListOf()
-                        for (document in documentSnapshot) {
-                            list.add(document.id)
-                        }
-                        for (element in list) {
-                            val quesNumRef = languageRef.document("$element")
-                            //get
-                            quesNumRef.get().addOnSuccessListener { documentSnapshot ->
-                                if (documentSnapshot != null) {
-                                    val docData = documentSnapshot.getString("問題数")
-                                    totalQuestNum = totalQuestNum + docData!!.toInt()
-                                    Log.d("", "$element の問題数は $docData 問です。")
+                    if(itemName == "模擬試験"){
+                        val examCount = documentSnapshot.size()
+                        totalQuestNum = examCount
+                    }else{
+                        if (documentSnapshot != null) {
+                            val list: MutableList<String> = mutableListOf()
+                            for (document in documentSnapshot) {
+                                list.add(document.id)
+                            }
+                            for (element in list) {
+                                val quesNumRef = languageRef.document("$element")
+
+                                //get
+                                quesNumRef.get().addOnSuccessListener { documentSnapshot ->
+                                    if (documentSnapshot != null) {
+
+                                        val docData = documentSnapshot.getString("問題数")
+                                        totalQuestNum = totalQuestNum + docData!!.toInt()
+                                        Log.d("", "$element の問題数は $docData 問です。")
+                                    }
                                 }
                             }
                         }
@@ -129,20 +143,32 @@ class LearnActivity : AppCompatActivity() {
             if (user != null){
                 userRef.get().addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot != null){
-                        var userAns = documentSnapshot.get(language+"解答数")
-                        var userCorrect = documentSnapshot.get(language+"正解数")
-                        userAns = userAns as? Double
-                        userCorrect = userCorrect as? Double
+                        val userAnsOri = documentSnapshot.get(language+"解答数")
+                        val userCorrectOri = documentSnapshot.get(language+"正解数")
+                        val userAns = (userAnsOri as? Long)?.toDouble() ?: 0.0
+                        val userCorrect = (userCorrectOri as? Long)?.toDouble() ?: 0.0
 
                         val totalRef = db.collection("合計問題数").document(language)
                         totalRef.get().addOnSuccessListener { documentSnapshot2 ->
                             if (documentSnapshot2 != null){
-                                var totalQuest = documentSnapshot2.get("合計問題数")
-                                totalQuest = totalQuest as? Double
-                                if (userAns != null || userCorrect != null || totalQuest != null){
-                                    tvAchieveRate.text = "${(userAns!! / totalQuest!!)*100}%"
-                                    tvCorrectAnsRate.text = "${(userCorrect!! / userAns!!)*100}%"
+                                val totalQuestString = documentSnapshot2.get("合計問題数")
+                                val totalQuest = (totalQuestString as? Long)?.toInt() ?: 0 // nullなら0を代入
+                                if (userAns != 0.0 && totalQuest != 0){
+                                    val aaaa = (userAns / totalQuest)*100
+                                    tvAchieveRate.text = "%.1f".format(aaaa)+"%"
                                 }
+                                if (userCorrect != 0.0 && totalQuest != 0){
+                                    if (language == "模擬試験"){
+                                        val bbbb = (userCorrect / totalQuest)*100
+                                        tvCorrectAnsRate.text = "%.1f".format(bbbb)+"%"
+                                    }else{
+                                        val bbbb = (userCorrect / userAns)*100
+                                        tvCorrectAnsRate.text = "%.1f".format(bbbb)+"%"
+                                    }
+
+                                }
+                                Log.d("","set text rate")
+                                Log.d("","aaaaaaaaaaaaaa$userAns $userCorrect $totalQuest")
                             }
                         }
                     }
@@ -154,8 +180,16 @@ class LearnActivity : AppCompatActivity() {
         count(true,"言語")
         count(false,"非言語")
         count(true,"非言語")
+        count(false,"模擬試験")
+        count(true,"模擬試験")
         //最初は言語を表示
-        display("言語")
+        //模擬試験画面からの遷移の場合模擬試験
+        if(fromExamMain == "模擬試験"){
+            display("模擬試験")
+        }else{
+            display("言語")
+        }
+
 
         radioGroup.setOnCheckedChangeListener { group, selected ->
             val radioGroup = findViewById<RadioGroup>(R.id.learnRadioGroup)
@@ -177,7 +211,7 @@ class LearnActivity : AppCompatActivity() {
 
                 R.id.learnRadioButton3 -> {
                     Log.d("radio checked", "radio checked $selectedBtText")
-                    //display("模擬試験")
+                    display("模擬試験")
                 }
             }
         }
@@ -195,7 +229,6 @@ class LearnActivity : AppCompatActivity() {
         }
         return returnVal
     }
-
 
     //戻るボタンをタップした時の処理。
     private inner class HelloListener : View.OnClickListener {

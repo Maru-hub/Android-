@@ -45,6 +45,7 @@ class ExamActivity : AppCompatActivity() {
                     finish()
                 }
                 R.id.button -> {
+                    finish()
                     val intent2Teststart= Intent(this@ExamActivity, ExamMainActivity::class.java)
                     startActivity(intent2Teststart)
                 }
@@ -55,6 +56,6 @@ class ExamActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //この画面が再表示されたら模試の問題数をリセット
-        currentQuestNum = 29
+        currentQuestNum = 0
     }
 }
