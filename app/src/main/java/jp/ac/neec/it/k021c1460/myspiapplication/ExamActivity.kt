@@ -1,14 +1,11 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
-import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.Spinner
 
 class ExamActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,21 +22,6 @@ class ExamActivity : AppCompatActivity() {
         btBack.setOnClickListener(listener)
         // 試験開始ボタンにリスナ設定
         btTeststart.setOnClickListener(listener)
-
-        // Spinner の参照を取得
-        val spinner: Spinner = findViewById(R.id.spinner)
-
-        // データのリストを作成
-        val items = listOf("模擬試験1", "模擬試験2", "模擬試験3")
-
-        // ArrayAdapter を作成
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
-
-        // スピナーのスタイルを設定 (ドロップダウンのスタイル)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        // スピナーにアダプターをセット
-        spinner.adapter = adapter
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
