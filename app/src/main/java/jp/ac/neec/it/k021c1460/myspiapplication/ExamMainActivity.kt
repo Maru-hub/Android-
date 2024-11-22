@@ -16,6 +16,8 @@ import android.widget.TextView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.SetOptions
 
 var currentQuestNum = 0
 class ExamMainActivity : AppCompatActivity() {
@@ -30,15 +32,25 @@ class ExamMainActivity : AppCompatActivity() {
     val userId = user?.uid
     //firebase
     val db = Firebase.firestore
+    //firestore参照
+    //val partRef = db.collection("模擬試験").document("問題"+currentQuestNum)
+    //val questRef = partRef.collection("問題").document("$questionNum")
+    val userRef = db.collection("users").document("$userId")
+    //val userPartRef = userRef.collection("模擬試験").document("$itemName")
 
+    fun correctReference(refNum : Int): DocumentReference {
+        val partRef = db.collection("模擬試験").document("問題"+refNum)
+        val CorrectRef = partRef.collection("選択肢").document("正解選択肢")
+        return CorrectRef
+    }
     //
     var examName = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam_main)
 
         currentQuestNum += 1
+
         val RgOpt = findViewById<RadioGroup>(R.id.examRadioGroup)
 
         val examQuestNum = currentQuestNum
@@ -70,10 +82,10 @@ class ExamMainActivity : AppCompatActivity() {
             }
             else{
                 //問題がデータベースにない(全問出題し終わった)時の処理をここに書く
-
-                val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-                startActivity(intent)
                 finish()
+                val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+                intent.putExtra("fromExamMain","模擬試験")
+                startActivity(intent)
             }
         }
 
@@ -121,8 +133,8 @@ class ExamMainActivity : AppCompatActivity() {
     }
     // カウントダウンタイマーの開始メソッド
     private fun startCountDownTimer() {
-        // 60秒のカウントダウンタイマーを開始
-        countDownTimer = object : CountDownTimer(60000, 1000) {
+        // 5秒のカウントダウンタイマーを開始
+        countDownTimer = object : CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
                 timerTextView.text = "残り時間: $secondsLeft 秒"
@@ -140,20 +152,44 @@ class ExamMainActivity : AppCompatActivity() {
     // 次の画面に遷移するメソッド
     private fun moveToNextScreen() {
 
-        val examRef = db.collection("users").document("$userId").
+        val userExamRef = db.collection("users").document("$userId").
         collection("模擬試験").document("問題$currentQuestNum")
+
 
         // RadioGroupから選択されたラジオボタンのテキストを取得
         val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)  // RadioGroupのIDを指定
         val selectedRadioButtonId = radioGroup.checkedRadioButtonId
 
+        fun delete(){
+            val userExamRef = db.collection("users").document("$userId").
+            collection("模擬試験")
+            userExamRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null){
+                    for (document in documentSnapshot) {
+                        document.reference.delete()
+                    }
+                }
+            }
+        }
         // 選択されたRadioButtonが存在する場合
         if (selectedRadioButtonId != -1) {
             val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
             val selectedText = selectedRadioButton.text.toString()  // 選択されたラジオボタンのテキストを取得
             Log.d("SelectedAnswer", "選択された回答: $selectedText")
-            val data = hashMapOf("ユーザーの解答" to selectedText)
-            examRef.set(data)
+            //一問目を保存する前にクリア
+            if (currentQuestNum == 1){ delete() }
+            correctReference(currentQuestNum).get().addOnSuccessListener { docmentSnapshot ->
+                if (docmentSnapshot != null){
+                    val docData = docmentSnapshot.get("正解選択肢")
+                    if (selectedText == docData){
+                        val data = hashMapOf("ユーザーの正誤" to "〇")
+                        userExamRef.set(data, SetOptions.merge())
+                    }else{
+                        val data = hashMapOf("ユーザーの正誤" to "×")
+                        userExamRef.set(data, SetOptions.merge())
+                    }
+                }
+            }
         }
         //今の画面を終了した後新たな画面を作成
         finish()
@@ -181,10 +217,10 @@ class ExamMainActivity : AppCompatActivity() {
             when(view.id){
                 R.id.bt_back -> {
                     countDownTimer?.cancel()  // バックボタン押下時にタイマーをキャンセル
-                    val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-
-                    startActivity(intent)
                     finish()
+                    val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+                    intent.putExtra("fromExamMain","模擬試験")
+                    startActivity(intent)
                 }
                 R.id.bt_next -> {
                     countDownTimer?.cancel()  // 次へボタン押下時にタイマーをキャンセル

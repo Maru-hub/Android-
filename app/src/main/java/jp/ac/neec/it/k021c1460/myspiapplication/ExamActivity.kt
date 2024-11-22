@@ -27,7 +27,7 @@ class ExamActivity : AppCompatActivity() {
         // 試験開始ボタンにリスナ設定
         btTeststart.setOnClickListener(listener)
 
-    // Spinner の参照を取得
+        // Spinner の参照を取得
         val spinner: Spinner = findViewById(R.id.spinner)
 
         // データのリストを作成
