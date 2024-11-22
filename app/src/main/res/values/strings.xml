@@ -3,4 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="escapStr">改行前\n改行後</string>
+    <string-array name="sp_sampleListItems">
+        <item>模擬試験1</item>
+        <item>模擬試験2</item>
+        <item>模擬試験3</item>
+    </string-array>
 </resources>

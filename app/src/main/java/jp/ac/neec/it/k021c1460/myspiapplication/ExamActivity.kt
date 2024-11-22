@@ -5,12 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.Spinner
 
 class ExamActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_mockexam)
+        setContentView(R.layout.activity_exam)
 
         // 試験開始ボタンであるButtonオブジェクトを取得
         val btTeststart = findViewById<Button>(R.id.button)
@@ -22,6 +24,21 @@ class ExamActivity : AppCompatActivity() {
         btBack.setOnClickListener(listener)
         // 試験開始ボタンにリスナ設定
         btTeststart.setOnClickListener(listener)
+
+        // Spinner の参照を取得
+        val spinner: Spinner = findViewById(R.id.spinner)
+
+        // データのリストを作成
+        val items = listOf("模擬試験1", "模擬試験2", "模擬試験3")
+
+        // ArrayAdapter を作成
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+
+        // スピナーのスタイルを設定 (ドロップダウンのスタイル)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        // スピナーにアダプターをセット
+        spinner.adapter = adapter
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
