@@ -11,7 +11,6 @@ import android.widget.Button
 import android.widget.Spinner
 
 class ExamActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam)
@@ -38,7 +37,6 @@ class ExamActivity : AppCompatActivity() {
 
         // スピナーのスタイルを設定 (ドロップダウンのスタイル)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
 
         // スピナーにアダプターをセット
         spinner.adapter = adapter

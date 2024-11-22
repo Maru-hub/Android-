@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.Html
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -30,8 +31,10 @@ class ExamMainActivity : AppCompatActivity() {
     val auth = Firebase.auth
     val user = auth.currentUser
     val userId = user?.uid
+
     //firebase
     val db = Firebase.firestore
+
     //firestore参照
     //val partRef = db.collection("模擬試験").document("問題"+currentQuestNum)
     //val questRef = partRef.collection("問題").document("$questionNum")
@@ -39,7 +42,7 @@ class ExamMainActivity : AppCompatActivity() {
     //val userPartRef = userRef.collection("模擬試験").document("$itemName")
 
     fun correctReference(refNum : Int): DocumentReference {
-        val partRef = db.collection("模擬試験").document("問題"+refNum)
+        val partRef = db.collection("$examName").document("問題"+refNum)
         val CorrectRef = partRef.collection("選択肢").document("正解選択肢")
         return CorrectRef
     }
@@ -76,8 +79,9 @@ class ExamMainActivity : AppCompatActivity() {
 
                 val tvState = findViewById<TextView>(R.id.examStatement)
                 val tvQuest = findViewById<TextView>(R.id.examQuestion)
-                tvState.text = statement.toString()
-                tvQuest.text = question.toString()
+
+                tvState.text = Html.fromHtml(statement.toString(), Html.FROM_HTML_MODE_COMPACT)
+                tvQuest.text = Html.fromHtml(question.toString(), Html.FROM_HTML_MODE_COMPACT)
                 Log.d(TAG, "log document Data: $docData")
             }
             else{
@@ -153,8 +157,7 @@ class ExamMainActivity : AppCompatActivity() {
     private fun moveToNextScreen() {
 
         val userExamRef = db.collection("users").document("$userId").
-        collection("模擬試験").document("問題$currentQuestNum")
-
+        collection("$examName").document("問題$currentQuestNum")
 
         // RadioGroupから選択されたラジオボタンのテキストを取得
         val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)  // RadioGroupのIDを指定
@@ -162,7 +165,7 @@ class ExamMainActivity : AppCompatActivity() {
 
         fun delete(){
             val userExamRef = db.collection("users").document("$userId").
-            collection("模擬試験")
+            collection("$examName")
             userExamRef.get().addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot != null){
                     for (document in documentSnapshot) {

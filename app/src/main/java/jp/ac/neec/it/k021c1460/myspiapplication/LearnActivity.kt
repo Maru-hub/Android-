@@ -5,18 +5,19 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Spinner
 import android.widget.TextView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
-
 
 class LearnActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,13 +48,16 @@ class LearnActivity : AppCompatActivity() {
         val userRef = db.collection("users").document("$userId")
         val userPartRef = userRef.collection("$itemWhich").document("$itemName")
         val choiRef = questRef.collection("選択肢").document("正解選択肢")
+
         //画面部品
         val tvAchieveRate = findViewById<TextView>(R.id.tvAchieveRate)
         val tvCorrectAnsRate = findViewById<TextView>(R.id.tvCorrectAnsRate)
         val btBack = findViewById<Button>(R.id.bthome4)// ホームボタン
         val rtExam = findViewById<RadioButton>(R.id.learnRadioButton3)
+
         // リスナクラスのインスタンスを生成
         val listener = HelloListener()
+
         // 最初の画面に戻るボタンにリスナを設定
         btBack.setOnClickListener(listener)
 
@@ -74,6 +78,7 @@ class LearnActivity : AppCompatActivity() {
             val languageRef = db.collection("$itemName")
             val userLanguageRef = db.collection("users").document("$userId")
                 .collection("$itemName")
+
             //get
             if (toUserCount){
                 userLanguageRef.get().addOnSuccessListener { documentSnapshot ->
@@ -112,7 +117,7 @@ class LearnActivity : AppCompatActivity() {
                 }
             }else{
                 languageRef.get().addOnSuccessListener { documentSnapshot ->
-                    if(itemName == "模擬試験"){
+                    if(itemName == "模擬試験1" && itemName == "模擬試験2" && itemName == "模擬試験3"){
                         val examCount = documentSnapshot.size()
                         totalQuestNum = examCount
                     }else{
@@ -139,6 +144,7 @@ class LearnActivity : AppCompatActivity() {
                 }
             }
         }
+
         fun display (language : String){
             if (user != null){
                 userRef.get().addOnSuccessListener { documentSnapshot ->
@@ -175,21 +181,35 @@ class LearnActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // Spinner の参照を取得
+        val spinner: Spinner = findViewById(R.id.spinner2)
+        // データのリストを作成
+        val items = listOf("模擬試験1", "模擬試験2", "模擬試験3")
+        // ArrayAdapter を作成
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+        // スピナーのスタイルを設定 (ドロップダウンのスタイル)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        // スピナーにアダプターをセット
+        spinner.adapter = adapter
+
+        // 選択されているアイテムを取得
+        val selectedItem = spinner.selectedItem.toString() // アイテムの文字列を取得
+
         //最初にユーザーデータを更新
         count(false,"言語")
         count(true,"言語")
         count(false,"非言語")
         count(true,"非言語")
-        count(false,"模擬試験")
-        count(true,"模擬試験")
+        count(false,"$selectedItem")
+        count(true,"$selectedItem")
         //最初は言語を表示
         //模擬試験画面からの遷移の場合模擬試験
         if(fromExamMain == "模擬試験"){
-            display("模擬試験")
+            display("$selectedItem")
         }else{
             display("言語")
         }
-
 
         radioGroup.setOnCheckedChangeListener { group, selected ->
             val radioGroup = findViewById<RadioGroup>(R.id.learnRadioGroup)
@@ -197,22 +217,57 @@ class LearnActivity : AppCompatActivity() {
             val selectedRadioBt = findViewById<RadioButton>(checkedBt)
             val selectedBtText = selectedRadioBt.text.toString()
             Log.d("radio checked", "radio checked $selectedBtText")
+
             //リスナが反応したら押下ボタン判定
             when (selected) {
                 R.id.learnRadioButton -> {
                     Log.d("radio checked", "radio checked $selectedBtText")
+                    // Spinner の参照を取得
+                    val spinner: Spinner = findViewById(R.id.spinner2)
+                    spinner.visibility = View.INVISIBLE //　見えないようにする
                     display("言語")
                 }
 
                 R.id.learnRadioButton2 -> {
                     Log.d("radio checked", "radio checked $selectedBtText")
+                    // Spinner の参照を取得
+                    val spinner: Spinner = findViewById(R.id.spinner2)
+                    spinner.visibility = View.INVISIBLE //　見えないようにする
                     display("非言語")
                 }
 
                 R.id.learnRadioButton3 -> {
                     Log.d("radio checked", "radio checked $selectedBtText")
-                    display("模擬試験")
+
+                    // Spinner の参照を取得
+                    val spinner: Spinner = findViewById(R.id.spinner2)
+                    spinner.visibility = View.VISIBLE //　見えるようにする
+                    // データのリストを作成
+                    val items = listOf("模擬試験1", "模擬試験2", "模擬試験3")
+                    // ArrayAdapter を作成
+                    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+                    // スピナーのスタイルを設定 (ドロップダウンのスタイル)
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    // スピナーにアダプターをセット
+                    spinner.adapter = adapter
+
+                    // 選択されているアイテムを取得
+                    val selectedItem = spinner.selectedItem.toString() // アイテムの文字列を取得
+                    display("$selectedItem")
+
                 }
+            }
+        }
+        // リスナを設定
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem = parent.getItemAtPosition(position).toString()
+                Log.d("Spinner", "Selected item: $selectedItem")
+                display(selectedItem)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                Log.d("Spinner", "Nothing selected")
             }
         }
     }
