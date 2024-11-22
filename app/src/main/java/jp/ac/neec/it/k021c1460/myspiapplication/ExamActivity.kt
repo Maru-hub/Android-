@@ -1,5 +1,6 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
+import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -63,11 +64,25 @@ class ExamActivity : AppCompatActivity() {
                 }
                 R.id.button -> {
                     finish()
-                    val intent2Teststart= Intent(this@ExamActivity, ExamMainActivity::class.java)
-                    startActivity(intent2Teststart)
+                    // 確認ダイアログを表示
+                    showConfirmationDialog()
                 }
             }
         }
+    }
+
+    private fun showConfirmationDialog() {
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setTitle("確認")
+            .setMessage("模擬試験を始めます。よろしいですか？\n"+"※模擬試験は次の問題に進んだら\n前の問題に戻ることはできません。\n" +
+                    "※問題数は30問あります。\n一回終了すると最初からになってしまいます。")
+            .setPositiveButton("はい") { _, _ ->
+                // 試験開始画面に遷移
+                val intent2Teststart = Intent(this@ExamActivity, ExamMainActivity::class.java)
+                startActivity(intent2Teststart)
+            }
+            .setNegativeButton("いいえ", null) // 何もしない
+            .show()
     }
 
     override fun onResume() {
