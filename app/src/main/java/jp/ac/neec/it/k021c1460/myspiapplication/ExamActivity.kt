@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.Spinner
 
 class ExamActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam)
@@ -26,7 +27,7 @@ class ExamActivity : AppCompatActivity() {
         // 試験開始ボタンにリスナ設定
         btTeststart.setOnClickListener(listener)
 
-        // Spinner の参照を取得
+    // Spinner の参照を取得
         val spinner: Spinner = findViewById(R.id.spinner)
 
         // データのリストを作成
@@ -37,6 +38,7 @@ class ExamActivity : AppCompatActivity() {
 
         // スピナーのスタイルを設定 (ドロップダウンのスタイル)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
 
         // スピナーにアダプターをセット
         spinner.adapter = adapter
@@ -62,8 +64,8 @@ class ExamActivity : AppCompatActivity() {
                 R.id.btHome1 -> {
                     finish()
                 }
+                //模試開始ボタン
                 R.id.button -> {
-                    finish()
                     // 確認ダイアログを表示
                     showConfirmationDialog()
                 }
@@ -72,6 +74,10 @@ class ExamActivity : AppCompatActivity() {
     }
 
     private fun showConfirmationDialog() {
+        // Spinner の参照を取得
+        val spinner: Spinner = findViewById(R.id.spinner)
+        val selectedItem = spinner.selectedItem.toString() // アイテムの文字列を取得
+
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setTitle("確認")
             .setMessage("模擬試験を始めます。よろしいですか？\n"+"※模擬試験は次の問題に進んだら\n前の問題に戻ることはできません。\n" +
@@ -79,7 +85,9 @@ class ExamActivity : AppCompatActivity() {
             .setPositiveButton("はい") { _, _ ->
                 // 試験開始画面に遷移
                 val intent2Teststart = Intent(this@ExamActivity, ExamMainActivity::class.java)
+                intent2Teststart.putExtra("examNum",selectedItem)
                 startActivity(intent2Teststart)
+                finish()
             }
             .setNegativeButton("いいえ", null) // 何もしない
             .show()

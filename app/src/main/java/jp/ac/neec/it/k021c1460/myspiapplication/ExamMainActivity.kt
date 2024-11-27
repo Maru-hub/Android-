@@ -43,7 +43,10 @@ class ExamMainActivity : AppCompatActivity() {
 
         val question = findViewById<TextView>(R.id.examQuestion)
         question.text = "test message"
-        val examName = "模擬試験"
+        //examNameは前の画面のspinnerで選択させた値にする。
+        var selectedExam = intent.getStringExtra("examNum")
+        if (selectedExam == "模擬試験1"){ selectedExam = "模擬試験"}
+        val examName = selectedExam
         val examNumber = findViewById<TextView>(R.id.examQuesNum)
         examNumber.text = "問題$examQuestNum"
 
@@ -171,6 +174,9 @@ class ExamMainActivity : AppCompatActivity() {
             when(view.id){
                 R.id.bt_back -> {
                     countDownTimer?.cancel()  // バックボタン押下時にタイマーをキャンセル
+                    val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+
+                    startActivity(intent)
                     finish()
                 }
                 R.id.bt_next -> {
