@@ -156,7 +156,7 @@ class LearnActivity : AppCompatActivity() {
                                 if (userAns != 0.0 && totalQuest != 0){
                                     val aaaa = (userAns / totalQuest)*100
                                     tvAchieveRate.text = "%.1f".format(aaaa)+"%"
-                                }
+                                }else{ tvAchieveRate.text = "0.0%" }
                                 if (userCorrect != 0.0 && totalQuest != 0){
                                     if (language == "模擬試験"){
                                         val bbbb = (userCorrect / totalQuest)*100
@@ -166,7 +166,7 @@ class LearnActivity : AppCompatActivity() {
                                         tvCorrectAnsRate.text = "%.1f".format(bbbb)+"%"
                                     }
 
-                                }
+                                }else{ tvCorrectAnsRate.text = "0.0%" }
                                 Log.d("","set text rate")
                                 Log.d("","aaaaaaaaaaaaaa$userAns $userCorrect $totalQuest")
                             }
