@@ -31,6 +31,9 @@ class ExamMainActivity : AppCompatActivity() {
     //firebase
     val db = Firebase.firestore
 
+    //
+    var examName = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam_main)
@@ -46,7 +49,9 @@ class ExamMainActivity : AppCompatActivity() {
         //examNameは前の画面のspinnerで選択させた値にする。
         var selectedExam = intent.getStringExtra("examNum")
         if (selectedExam == "模擬試験1"){ selectedExam = "模擬試験"}
-        val examName = selectedExam
+        if (selectedExam != null) {
+            examName = selectedExam
+        }
         val examNumber = findViewById<TextView>(R.id.examQuesNum)
         examNumber.text = "問題$examQuestNum"
 
@@ -65,9 +70,10 @@ class ExamMainActivity : AppCompatActivity() {
             }
             else{
                 //問題がデータベースにない(全問出題し終わった)時の処理をここに書く
-                finish()
+
                 val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
                 startActivity(intent)
+                finish()
             }
         }
 
@@ -116,7 +122,7 @@ class ExamMainActivity : AppCompatActivity() {
     // カウントダウンタイマーの開始メソッド
     private fun startCountDownTimer() {
         // 5秒のカウントダウンタイマーを開始
-        countDownTimer = object : CountDownTimer(2000, 1000) {
+        countDownTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
                 timerTextView.text = "残り時間: $secondsLeft 秒"
@@ -152,6 +158,7 @@ class ExamMainActivity : AppCompatActivity() {
         //今の画面を終了した後新たな画面を作成
         finish()
         val intent = Intent(this@ExamMainActivity, ExamMainActivity::class.java)
+        intent.putExtra("examNum",examName)
         startActivity(intent)
     }
 
