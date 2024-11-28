@@ -121,7 +121,7 @@ class ExamMainActivity : AppCompatActivity() {
     }
     // カウントダウンタイマーの開始メソッド
     private fun startCountDownTimer() {
-        // 5秒のカウントダウンタイマーを開始
+        // 60秒のカウントダウンタイマーを開始
         countDownTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
