@@ -188,7 +188,7 @@ class LoginActivity : AppCompatActivity() {
         if (user != null){
             tv_title.text = user.email
             tv_statue.text = "ログインしています"
-            tv_detail.text = user.uid
+            //tv_detail.text = user.uid
             bt_signOut.visibility = View.VISIBLE
         }
         else{

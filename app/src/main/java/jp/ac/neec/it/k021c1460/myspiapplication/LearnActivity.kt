@@ -8,14 +8,15 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ListView
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 
@@ -35,12 +36,13 @@ class LearnActivity : AppCompatActivity() {
         val auth = com.google.firebase.ktx.Firebase.auth
         val user = auth.currentUser
         val userId = user?.uid
+
         //bundle 取得
         val itemName = intent.getStringExtra("itemName")
         val itemWhich = intent.getStringExtra("itemWhich")
         val questionNum = intent.getStringExtra("questionNum")
         val selectedAnswer = intent.getStringExtra("selectedAnswer")
-        val fromExamMain = intent.getStringExtra("fromExamMain")
+        var fromExamMain = intent.getStringExtra("fromExamMain")
 
         //firestore参照
         val partRef = db.collection("$itemWhich").document("$itemName")
@@ -64,29 +66,68 @@ class LearnActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         //模擬試験画面からの遷移の場合選択
-        if(fromExamMain == "模擬試験"){
+        if(fromExamMain != null){
             rtExam.isChecked = true
+            // Spinner の参照を取得
+            val spinner: Spinner = findViewById(R.id.spinner2)
+            spinner.visibility = View.VISIBLE //　見えるようにする
+
+            // データのリストを作成
+            val items = listOf("模擬試験1", "模擬試験2", "模擬試験3")
+            // ArrayAdapter を作成
+            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+            // スピナーのスタイルを設定 (ドロップダウンのスタイル)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // スピナーにアダプターをセット
+            spinner.adapter = adapter
+
+            if(fromExamMain == "模擬試験1"){spinner.setSelection(0)}
+            if(fromExamMain == "模擬試験2"){spinner.setSelection(1)}
+            if(fromExamMain == "模擬試験3"){spinner.setSelection(2)}
+        }
+
+        //問題解答数をカウント
+        fun count(itemName : String){
+            //変数定義
+            var totalQuestNum = 0
+
+            val languageRef = db.collection("$itemName")
+            languageRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val list: MutableList<String> = mutableListOf()
+                    for (document in documentSnapshot) {
+                        list.add(document.id)
+                    }
+                    for (element in list) {
+                        val quesNumRef = languageRef.document("$element")
+                        //get
+                        quesNumRef.get().addOnSuccessListener { documentSnapshot ->
+                            if (documentSnapshot != null) {
+                                val docData = documentSnapshot.getString("問題数")
+                                totalQuestNum = totalQuestNum + docData!!.toInt()
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         //言語、非言語の総問題数を数える
-        fun count(toUserCount : Boolean,itemName: String){
+        fun userCount(itemName: String){
             //変数定義
-            var totalQuestNum = 0
             var userTotalQuestNum = 0
             var userCorrectNum = 0
 
-            val languageRef = db.collection("$itemName")
             val userLanguageRef = db.collection("users").document("$userId")
                 .collection("$itemName")
 
-            //get
-            if (toUserCount){
-                userLanguageRef.get().addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot != null) {
-                        val list: MutableList<String> = mutableListOf()
-                        for (document in documentSnapshot) {
-                            list.add(document.id)
-                        }
+            //get user/userId/itemName
+            userLanguageRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val list: MutableList<String> = mutableListOf()
+                    for (document in documentSnapshot) {
+                        list.add(document.id)
+                    }
                         for (element in list) {
                             val quesNumRef = userLanguageRef.document("$element")
                             //get
@@ -105,82 +146,151 @@ class LearnActivity : AppCompatActivity() {
                                         }
                                     }
                                     userTotalQuestNum = userTotalQuestNum + docDataSize!!.toInt()
-                                    Log.d("", "ユーザーの$element の問題数は $docDataSize 問です。")
-                                    Log.d("", "userTotalQuestNum = $userTotalQuestNum")
-                                    Log.d("", "userTotalQuestNum = $userCorrectNum")
-                                    userRef.set(hashMapOf( itemName+"解答数" to userTotalQuestNum ), SetOptions.merge())
-                                    userRef.set(hashMapOf( itemName+"正解数" to userCorrectNum ), SetOptions.merge())
+                                    // 解答数の更新
+                                    userRef.set(hashMapOf(itemName + "解答数" to userTotalQuestNum), SetOptions.merge())
+                                    // 正解数の更新
+                                    userRef.set(hashMapOf(itemName + "正解数" to userCorrectNum), SetOptions.merge())
                                 }
                             }
                         }
-                    }
                 }
-            }else{
-                languageRef.get().addOnSuccessListener { documentSnapshot ->
-                    if(itemName == "模擬試験1" && itemName == "模擬試験2" && itemName == "模擬試験3"){
-                        val examCount = documentSnapshot.size()
-                        totalQuestNum = examCount
-                    }else{
-                        if (documentSnapshot != null) {
-                            val list: MutableList<String> = mutableListOf()
-                            for (document in documentSnapshot) {
-                                list.add(document.id)
-                            }
-                            for (element in list) {
-                                val quesNumRef = languageRef.document("$element")
+            }
+        }
 
-                                //get
-                                quesNumRef.get().addOnSuccessListener { documentSnapshot ->
-                                    if (documentSnapshot != null) {
+        fun userExamCount(examName: String) {
+            // 変数定義
+            var userTotalQuestNum = 0
+            var userCorrectNum = 0
 
-                                        val docData = documentSnapshot.getString("問題数")
-                                        totalQuestNum = totalQuestNum + docData!!.toInt()
-                                        Log.d("", "$element の問題数は $docData 問です。")
-                                    }
+            val userLanguageRef = db.collection("users").document("$userId").collection("$examName")
+
+            // 非同期タスクをリストに格納
+            val tasks = mutableListOf<Task<DocumentSnapshot>>()
+
+            userLanguageRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    userTotalQuestNum = documentSnapshot.size()
+
+                    // 各ドキュメントを処理
+                    for (document in documentSnapshot.documents) {
+                        val docId = document.id
+
+                        // 非同期タスクを追加
+                        val task = userLanguageRef.document(docId).get().addOnSuccessListener { documentSnapshot2 ->
+                            if (documentSnapshot2 != null) {
+                                val collect = documentSnapshot2.getString("ユーザーの正誤")
+                                if (collect == "〇") {
+                                    userCorrectNum++
                                 }
                             }
                         }
+                        tasks.add(task) // タスクリストに追加
+                    }
+
+                    // すべてのタスクが完了した後に処理を続行
+                    Tasks.whenAllComplete(tasks).addOnSuccessListener {
+                        // 解答数の更新
+                        userRef.set(hashMapOf(examName + "解答数" to userTotalQuestNum), SetOptions.merge())
+                        // 正解数の更新
+                        userRef.set(hashMapOf(examName + "正解数" to userCorrectNum), SetOptions.merge())
                     }
                 }
             }
         }
 
-        fun display (language : String){
-            if (user != null){
+
+        fun display(itemName: String) {
+            if (user != null) {
+                // ユーザー情報を取得
                 userRef.get().addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot != null){
-                        val userAnsOri = documentSnapshot.get(language+"解答数")
-                        val userCorrectOri = documentSnapshot.get(language+"正解数")
+                    if (documentSnapshot != null) {
+                        val userAnsOri = documentSnapshot.get(itemName + "解答数")
+                        val userCorrectOri = documentSnapshot.get(itemName + "正解数")
                         val userAns = (userAnsOri as? Long)?.toDouble() ?: 0.0
                         val userCorrect = (userCorrectOri as? Long)?.toDouble() ?: 0.0
 
-                        val totalRef = db.collection("合計問題数").document(language)
+                        // 合計問題数を取得
+                        val totalRef = db.collection("合計問題数").document(itemName)
                         totalRef.get().addOnSuccessListener { documentSnapshot2 ->
-                            if (documentSnapshot2 != null){
+                            if (documentSnapshot2 != null) {
                                 val totalQuestString = documentSnapshot2.get("合計問題数")
-                                val totalQuest = (totalQuestString as? Long)?.toInt() ?: 0 // nullなら0を代入
-                                if (userAns != 0.0 && totalQuest != 0){
-                                    val aaaa = (userAns / totalQuest)*100
-                                    tvAchieveRate.text = "%.1f".format(aaaa)+"%"
-                                }else{ tvAchieveRate.text = "0.0%" }
-                                if (userCorrect != 0.0 && totalQuest != 0){
-                                    if (language == "模擬試験"){
-                                        val bbbb = (userCorrect / totalQuest)*100
-                                        tvCorrectAnsRate.text = "%.1f".format(bbbb)+"%"
-                                    }else{
-                                        val bbbb = (userCorrect / userAns)*100
-                                        tvCorrectAnsRate.text = "%.1f".format(bbbb)+"%"
-                                    }
+                                val totalQuest = (totalQuestString as? Long)?.toInt() ?: 0
 
-                                }else{ tvCorrectAnsRate.text = "0.0%" }
-                                Log.d("","set text rate")
-                                Log.d("","aaaaaaaaaaaaaa$userAns $userCorrect $totalQuest")
+                                // 達成率を計算してUIを更新
+                                val achieveRate = if (userAns != 0.0 && totalQuest != 0) {
+                                    (userAns / totalQuest) * 100
+                                } else 0.0
+                                tvAchieveRate.text = "%.1f".format(achieveRate) + "%"
+
+                                // 正答率を計算してUIを更新
+                                val correctAnsRate = if (userCorrect != 0.0) {
+                                    if (itemName == "模擬試験1" || itemName == "模擬試験2" || itemName == "模擬試験3") {
+                                        if (totalQuest != 0) (userCorrect / totalQuest) * 100 else 0.0
+                                    } else {
+                                        if (userAns != 0.0) (userCorrect / userAns) * 100 else 0.0
+                                    }
+                                } else 0.0
+                                tvCorrectAnsRate.text = "%.1f".format(correctAnsRate) + "%"
+                            } else {
+                                // データが存在しない場合のフォールバック
+                                tvAchieveRate.text = "0.0%"
+                                tvCorrectAnsRate.text = "0.0%"
                             }
+                        }.addOnFailureListener { e ->
+                            Log.e("FirestoreError", "Error fetching total questions: ${e.message}")
                         }
+                    } else {
+                        Log.w("FirestoreWarning", "User data not found.")
                     }
+                }.addOnFailureListener { e ->
+                    Log.e("FirestoreError", "Error fetching user data: ${e.message}")
                 }
             }
         }
+
+
+        fun examDisplay(examName: String) {
+            if (user != null) {
+                // ユーザーデータの取得
+                userRef.get().addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot != null) {
+                        val userAnsOri = documentSnapshot.get(examName + "解答数")
+                        val userCorrectOri = documentSnapshot.get(examName + "正解数")
+                        val userAns = (userAnsOri as? Long)?.toDouble() ?: 0.0
+                        val userCorrect = (userCorrectOri as? Long)?.toDouble() ?: 0.0
+
+                        // 合計問題数の取得
+                        val totalRef = db.collection("合計問題数").document(examName)
+                        totalRef.get().addOnSuccessListener { documentSnapshot2 ->
+                            if (documentSnapshot2 != null) {
+                                val totalQuestString = documentSnapshot2.get("合計問題数")
+                                val totalQuest = (totalQuestString as? Long)?.toInt() ?: 30 // nullなら0を代入
+
+                                // データ計算とUI更新
+                                if (userAns != 0.0 && totalQuest != 0) {
+                                    val achieveRate = (userAns / totalQuest) * 100
+                                    tvAchieveRate.text = "%.1f".format(achieveRate) + "%"
+                                } else {
+                                    tvAchieveRate.text = "0.0%"
+                                }
+
+                                if (userCorrect != 0.0 && userAns != 0.0) {
+                                    val correctAnsRate = (userCorrect / userAns) * 100
+                                    tvCorrectAnsRate.text = "%.1f".format(correctAnsRate) + "%"
+                                } else {
+                                    tvCorrectAnsRate.text = "0.0%"
+                                }
+                            }
+                        }.addOnFailureListener { e ->
+                            Log.e("FirestoreError", "Error getting total questions: ${e.message}")
+                        }
+                    }
+                }.addOnFailureListener { e ->
+                    Log.e("FirestoreError", "Error getting user data: ${e.message}")
+                }
+            }
+        }
+
 
         // Spinner の参照を取得
         val spinner: Spinner = findViewById(R.id.spinner2)
@@ -192,21 +302,25 @@ class LearnActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         // スピナーにアダプターをセット
         spinner.adapter = adapter
-
         // 選択されているアイテムを取得
         val selectedItem = spinner.selectedItem.toString() // アイテムの文字列を取得
 
         //最初にユーザーデータを更新
-        count(false,"言語")
-        count(true,"言語")
-        count(false,"非言語")
-        count(true,"非言語")
-        count(false,"$selectedItem")
-        count(true,"$selectedItem")
+        userCount("言語")
+        count("言語")
+        userCount("非言語")
+        count("非言語")
+        userExamCount("模擬試験1")
+        userExamCount("模擬試験2")
+        userExamCount("模擬試験3")
+
         //最初は言語を表示
         //模擬試験画面からの遷移の場合模擬試験
-        if(fromExamMain == "模擬試験"){
-            display("$selectedItem")
+        if(fromExamMain != null){
+            if(fromExamMain == "模擬試験1"){spinner.setSelection(0)}
+            if(fromExamMain == "模擬試験2"){spinner.setSelection(1)}
+            if(fromExamMain == "模擬試験3"){spinner.setSelection(2)}
+            examDisplay("$selectedItem")
         }else{
             display("言語")
         }
@@ -253,17 +367,16 @@ class LearnActivity : AppCompatActivity() {
 
                     // 選択されているアイテムを取得
                     val selectedItem = spinner.selectedItem.toString() // アイテムの文字列を取得
-                    display("$selectedItem")
-
+                    userExamCount("$selectedItem")
+                    examDisplay("$selectedItem")
                 }
             }
         }
-        // リスナを設定
+        // spinnerにリスナを設定
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedItem = parent.getItemAtPosition(position).toString()
-                Log.d("Spinner", "Selected item: $selectedItem")
-                display(selectedItem)
+                examDisplay(selectedItem)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {

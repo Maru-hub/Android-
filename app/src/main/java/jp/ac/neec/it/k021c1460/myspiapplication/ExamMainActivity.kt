@@ -41,12 +41,24 @@ class ExamMainActivity : AppCompatActivity() {
     val userRef = db.collection("users").document("$userId")
     //val userPartRef = userRef.collection("模擬試験").document("$itemName")
 
+    //変数
+    var selectedExam = ""
+
+    //LearnActivityへの遷移
+    fun toMoveLearn(){
+        finish()
+        val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+        intent.putExtra("fromExamMain","$selectedExam")
+        startActivity(intent)
+    }
+
     fun correctReference(refNum : Int): DocumentReference {
         val partRef = db.collection("$examName").document("問題"+refNum)
         val CorrectRef = partRef.collection("選択肢").document("正解選択肢")
         return CorrectRef
     }
-    //
+
+
     var examName = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,11 +74,12 @@ class ExamMainActivity : AppCompatActivity() {
         val question = findViewById<TextView>(R.id.examQuestion)
         question.text = "test message"
         //examNameは前の画面のspinnerで選択させた値にする。
-        var selectedExam = intent.getStringExtra("examNum")
-        if (selectedExam == "模擬試験1"){ selectedExam = "模擬試験"}
+        selectedExam = intent.getStringExtra("examNum").toString()
+
         if (selectedExam != null) {
             examName = selectedExam
         }
+
         val examNumber = findViewById<TextView>(R.id.examQuesNum)
         examNumber.text = "問題$examQuestNum"
 
@@ -86,12 +99,10 @@ class ExamMainActivity : AppCompatActivity() {
             }
             else{
                 //問題がデータベースにない(全問出題し終わった)時の処理をここに書く
-                finish()
-                val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-                intent.putExtra("fromExamMain","模擬試験")
-                startActivity(intent)
+                toMoveLearn()
             }
         }
+
 
         val examOptRef = examRef.collection("選択肢").document("選択肢")
         examOptRef.get().addOnSuccessListener { documentSnapshot ->
@@ -156,7 +167,7 @@ class ExamMainActivity : AppCompatActivity() {
     // 次の画面に遷移するメソッド
     private fun moveToNextScreen() {
 
-        val userExamRef = db.collection("users").document("$userId").
+        val userExamDocRef = db.collection("users").document("$userId").
         collection("$examName").document("問題$currentQuestNum")
 
         // RadioGroupから選択されたラジオボタンのテキストを取得
@@ -186,10 +197,14 @@ class ExamMainActivity : AppCompatActivity() {
                     val docData = docmentSnapshot.get("正解選択肢")
                     if (selectedText == docData){
                         val data = hashMapOf("ユーザーの正誤" to "〇")
-                        userExamRef.set(data, SetOptions.merge())
+                        userExamDocRef.set(data, SetOptions.merge())
+                            .addOnSuccessListener {
+                                Log.d("Firestore", "mosi de-ta hozonn kannryou")
+                                // 成功時の追加処理
+                            }
                     }else{
                         val data = hashMapOf("ユーザーの正誤" to "×")
-                        userExamRef.set(data, SetOptions.merge())
+                        userExamDocRef.set(data, SetOptions.merge())
                     }
                 }
             }
@@ -220,10 +235,7 @@ class ExamMainActivity : AppCompatActivity() {
             when(view.id){
                 R.id.bt_back -> {
                     countDownTimer?.cancel()  // バックボタン押下時にタイマーをキャンセル
-                    finish()
-                    val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-                    intent.putExtra("fromExamMain","模擬試験")
-                    startActivity(intent)
+                    toMoveLearn()
                 }
                 R.id.bt_next -> {
                     countDownTimer?.cancel()  // 次へボタン押下時にタイマーをキャンセル
