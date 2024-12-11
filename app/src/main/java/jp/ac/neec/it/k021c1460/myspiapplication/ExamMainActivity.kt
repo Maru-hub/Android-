@@ -47,20 +47,28 @@ class ExamMainActivity : AppCompatActivity() {
     var selectedExam = ""
 
     //LearnActivityへの遷移
-    fun toMoveLearn(){
+    fun toMoveLearn() {
         val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setTitle("確認")
+        val alertDialog = dialogBuilder.setTitle("確認")
             .setMessage("模擬試験を終了しますよろしいですか？")
             .setPositiveButton("はい") { _, _ ->
                 // 試験開始画面に遷移
                 finish()
                 val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-                intent.putExtra("fromExamMain","$selectedExam")
+                intent.putExtra("fromExamMain", "$selectedExam")
                 startActivity(intent)
             }
-                .setNegativeButton("いいえ", null) //何もしない
-                .show()
+            .setNegativeButton("いいえ", null)  // 何もしない
+            .create()
+
+        // ダイアログがバックグラウンドで動作するように設定
+        alertDialog.setCancelable(true)
+        alertDialog.setOnDismissListener {
+            // ダイアログを閉じた際にカウントダウンを再開する処理などを追加する場合はここに記述
+        }
+        alertDialog.show()
     }
+
 
     fun correctReference(refNum : Int): DocumentReference {
         val partRef = db.collection("$examName").document("問題"+refNum)
