@@ -78,7 +78,7 @@ class ExamActivity : AppCompatActivity() {
 
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setTitle("確認")
-            .setMessage("模擬試験を始めます。よろしいですか？\n"+"※模擬試験は次の問題に進んだら\n前の問題に戻ることはできません。\n" +
+            .setMessage("$selectedItem を始めます。よろしいですか？\n"+"※模擬試験は次の問題に進んだら\n前の問題に戻ることはできません。\n" +
                     "※問題数は30問あります。\n一回終了すると最初からになってしまいます。")
             .setPositiveButton("はい") { _, _ ->
                 // 試験開始画面に遷移

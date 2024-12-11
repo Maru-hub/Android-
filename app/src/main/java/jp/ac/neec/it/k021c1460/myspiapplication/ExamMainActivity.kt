@@ -14,6 +14,8 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.ktx.auth
@@ -46,10 +48,18 @@ class ExamMainActivity : AppCompatActivity() {
 
     //LearnActivityへの遷移
     fun toMoveLearn(){
-        finish()
-        val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-        intent.putExtra("fromExamMain","$selectedExam")
-        startActivity(intent)
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setTitle("確認")
+            .setMessage("模擬試験を終了しますよろしいですか？")
+            .setPositiveButton("はい") { _, _ ->
+                // 試験開始画面に遷移
+                finish()
+                val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+                intent.putExtra("fromExamMain","$selectedExam")
+                startActivity(intent)
+            }
+                .setNegativeButton("いいえ", null) //何もしない
+                .show()
     }
 
     fun correctReference(refNum : Int): DocumentReference {
@@ -159,7 +169,7 @@ class ExamMainActivity : AppCompatActivity() {
 
             override fun onFinish() {
                 timerTextView.text = "残り時間: 0秒"
-                moveToNextScreen()
+                toMoveLearn()
             }
         }.start()
     }
@@ -239,7 +249,13 @@ class ExamMainActivity : AppCompatActivity() {
                 }
                 R.id.bt_next -> {
                     countDownTimer?.cancel()  // 次へボタン押下時にタイマーをキャンセル
-                    moveToNextScreen()  // 同じ画面に戻る
+                    val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)
+                    val selectedId = radioGroup.checkedRadioButtonId
+                    //選択されていない場合は遷移しない
+                    if (selectedId != -1) {
+                        moveToNextScreen()  // 同じ画面に戻る
+                    }
+
                 }
             }
         }
