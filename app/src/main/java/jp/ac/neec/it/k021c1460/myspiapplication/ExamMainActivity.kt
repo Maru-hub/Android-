@@ -21,8 +21,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.*
 
 var currentQuestNum = 0
+var totalTime = 0L
 class ExamMainActivity : AppCompatActivity() {
 
     private lateinit var circleProgressView: CircleProgressView
@@ -48,25 +50,30 @@ class ExamMainActivity : AppCompatActivity() {
 
     //LearnActivityへの遷移
     fun toMoveLearn() {
-        val dialogBuilder = AlertDialog.Builder(this)
-        val alertDialog = dialogBuilder.setTitle("確認")
-            .setMessage("模擬試験を終了しますよろしいですか？")
-            .setPositiveButton("はい") { _, _ ->
-                // 試験開始画面に遷移
-                finish()
-                val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-                intent.putExtra("fromExamMain", "$selectedExam")
-                startActivity(intent)
-            }
-            .setNegativeButton("いいえ", null)  // 何もしない
-            .create()
+        //stopCountDownTimerCoroutine() // タイマーを一旦停止
 
-        // ダイアログがバックグラウンドで動作するように設定
-        alertDialog.setCancelable(true)
-        alertDialog.setOnDismissListener {
-            // ダイアログを閉じた際にカウントダウンを再開する処理などを追加する場合はここに記述
+        if (totalTime != 0L){
+            val dialogBuilder = AlertDialog.Builder(this)
+            dialogBuilder.setTitle("確認")
+                .setMessage("模擬試験を終了しますよろしいですか？")
+                .setPositiveButton("はい") { _, _ ->
+                    finish()
+                    val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+                    intent.putExtra("fromExamMain", "$selectedExam")
+                    startActivity(intent)
+                }
+                .setNegativeButton("いいえ") { _, _ ->
+                    //startCountDownTimerCoroutine() // タイマーを再開
+                }
+                .setOnCancelListener {
+                    //startCountDownTimerCoroutine() // タイマーを再開
+                }
+                .show()
+        } else{
+            val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
+            intent.putExtra("fromExamMain", "$selectedExam")
+            startActivity(intent)
         }
-        alertDialog.show()
     }
 
 
@@ -152,11 +159,20 @@ class ExamMainActivity : AppCompatActivity() {
             circleProgressView = findViewById(R.id.circleProgressView)
             timerTextView = findViewById(R.id.timerTextView)
 
-            startCountDownTimer()
+            startCountDownTimerCoroutine()
 
             // ホームボタンであるButtonオブジェクトを取得
             val btBack = findViewById<Button>(R.id.bt_back)
             val btNext = findViewById<Button>(R.id.bt_next)
+
+            RgOpt.setOnCheckedChangeListener { group, checkedId ->
+                if(RgOpt.checkedRadioButtonId != -1){ btNext.visibility = View.VISIBLE }
+            }
+
+            //次へボタンはラジオボタンを選択しないと表示しない
+
+            if(RgOpt.checkedRadioButtonId == -1){btNext.visibility = View.INVISIBLE}
+
             // リスナクラスのインスタンスを生成
             val listener = HelloListener()
             btBack.setOnClickListener(listener)
@@ -164,22 +180,30 @@ class ExamMainActivity : AppCompatActivity() {
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-    // カウントダウンタイマーの開始メソッド
-    private fun startCountDownTimer() {
-        // 5秒のカウントダウンタイマーを開始
-        countDownTimer = object : CountDownTimer(5000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val secondsLeft = millisUntilFinished / 1000
-                timerTextView.text = "残り時間: $secondsLeft 秒"
-                val progress = (5000 - millisUntilFinished) / 5000f
-                circleProgressView.setProgress(progress)
-            }
 
-            override fun onFinish() {
-                timerTextView.text = "残り時間: 0秒"
-                toMoveLearn()
+    private var countdownJob: Job? = null
+
+    // コルーチンによるタイマーの開始
+    private fun startCountDownTimerCoroutine() {
+        countdownJob?.cancel()  // 古いジョブをキャンセル
+        countdownJob = CoroutineScope(Dispatchers.Main).launch {
+            totalTime = 30 * 1000L
+            var remainingTime = totalTime
+            while (remainingTime > 0) {
+                delay(1000)
+                remainingTime -= 1000
+                val secondsLeft = remainingTime / 1000
+                timerTextView.text = "残り時間: $secondsLeft 秒"
+                circleProgressView.setProgress((totalTime - remainingTime) / totalTime.toFloat())
             }
-        }.start()
+            timerTextView.text = "残り時間: 0秒"
+            moveToNextScreen()
+        }
+    }
+
+    // コルーチンによるタイマー停止
+    private fun stopCountDownTimerCoroutine() {
+        countdownJob?.cancel()
     }
 
     // 次の画面に遷移するメソッド
