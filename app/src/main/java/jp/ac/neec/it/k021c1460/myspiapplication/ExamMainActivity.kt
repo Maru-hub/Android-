@@ -49,10 +49,8 @@ class ExamMainActivity : AppCompatActivity() {
     var selectedExam = ""
 
     //LearnActivityへの遷移
-    fun toMoveLearn() {
-        //stopCountDownTimerCoroutine() // タイマーを一旦停止
-
-        if (totalTime != 0L){
+    fun toMoveLearn( mode : String = "normal") {
+        if (totalTime != 0L && mode != "kill"){
             val dialogBuilder = AlertDialog.Builder(this)
             dialogBuilder.setTitle("確認")
                 .setMessage("模擬試験を終了しますよろしいですか？")
@@ -70,6 +68,8 @@ class ExamMainActivity : AppCompatActivity() {
                 }
                 .show()
         } else{
+            countdownJob = null  // 古いジョブをキャンセル
+            finish()
             val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
             intent.putExtra("fromExamMain", "$selectedExam")
             startActivity(intent)
@@ -89,7 +89,7 @@ class ExamMainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exam_main)
 
-        currentQuestNum += 1
+        currentQuestNum += 10
 
         val RgOpt = findViewById<RadioGroup>(R.id.examRadioGroup)
 
@@ -110,10 +110,13 @@ class ExamMainActivity : AppCompatActivity() {
 
         val examRef = db.collection("$examName").document("問題"+examQuestNum)
         examRef.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot != null && documentSnapshot.exists()) {
+            if (documentSnapshot != null) {
+                Log.d("","$documentSnapshot")
                 val docData = documentSnapshot.data
                 val statement = (docData?.get("問題文"))
                 val question = (docData?.get("設問文"))
+
+                //if (statement == null && question == null){ toMoveLearn("kill") }
 
                 val tvState = findViewById<TextView>(R.id.examStatement)
                 val tvQuest = findViewById<TextView>(R.id.examQuestion)
@@ -121,10 +124,6 @@ class ExamMainActivity : AppCompatActivity() {
                 tvState.text = Html.fromHtml(statement.toString(), Html.FROM_HTML_MODE_COMPACT)
                 tvQuest.text = Html.fromHtml(question.toString(), Html.FROM_HTML_MODE_COMPACT)
                 Log.d(TAG, "log document Data: $docData")
-            }
-            else{
-                //問題がデータベースにない(全問出題し終わった)時の処理をここに書く
-                toMoveLearn()
             }
         }
 
@@ -187,75 +186,89 @@ class ExamMainActivity : AppCompatActivity() {
     private fun startCountDownTimerCoroutine() {
         countdownJob?.cancel()  // 古いジョブをキャンセル
         countdownJob = CoroutineScope(Dispatchers.Main).launch {
-            totalTime = 30 * 1000L
+            totalTime = 3 * 1000L
             var remainingTime = totalTime
             while (remainingTime > 0) {
-                delay(1000)
-                remainingTime -= 1000
                 val secondsLeft = remainingTime / 1000
                 timerTextView.text = "残り時間: $secondsLeft 秒"
+                delay(1000)
+                remainingTime -= 1000
                 circleProgressView.setProgress((totalTime - remainingTime) / totalTime.toFloat())
             }
-            timerTextView.text = "残り時間: 0秒"
-            moveToNextScreen()
+            if(remainingTime == 0L){
+                countdownJob = null
+                timerTextView.text = "残り時間: 0 秒"
+                moveToNextScreen()
+            }
+
         }
     }
+
+
 
     // コルーチンによるタイマー停止
     private fun stopCountDownTimerCoroutine() {
         countdownJob?.cancel()
     }
 
+
     // 次の画面に遷移するメソッド
     private fun moveToNextScreen() {
-
-        val userExamDocRef = db.collection("users").document("$userId").
+        //30問を超えると終了処理
+        if (currentQuestNum <= 30){
+            val userExamDocRef = db.collection("users").document("$userId").
         collection("$examName").document("問題$currentQuestNum")
 
-        // RadioGroupから選択されたラジオボタンのテキストを取得
-        val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)  // RadioGroupのIDを指定
-        val selectedRadioButtonId = radioGroup.checkedRadioButtonId
+            // RadioGroupから選択されたラジオボタンのテキストを取得
+            val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)  // RadioGroupのIDを指定
+            val selectedRadioButtonId = radioGroup.checkedRadioButtonId
 
-        fun delete(){
-            val userExamRef = db.collection("users").document("$userId").
-            collection("$examName")
-            userExamRef.get().addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot != null){
-                    for (document in documentSnapshot) {
-                        document.reference.delete()
+            fun delete(){
+                val userExamRef = db.collection("users").document("$userId").
+                collection("$examName")
+                userExamRef.get().addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot != null){
+                        for (document in documentSnapshot) {
+                            document.reference.delete()
+                        }
                     }
                 }
             }
-        }
-        // 選択されたRadioButtonが存在する場合
-        if (selectedRadioButtonId != -1) {
-            val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
-            val selectedText = selectedRadioButton.text.toString()  // 選択されたラジオボタンのテキストを取得
-            Log.d("SelectedAnswer", "選択された回答: $selectedText")
-            //一問目を保存する前にクリア
-            if (currentQuestNum == 1){ delete() }
-            correctReference(currentQuestNum).get().addOnSuccessListener { docmentSnapshot ->
-                if (docmentSnapshot != null){
-                    val docData = docmentSnapshot.get("正解選択肢")
-                    if (selectedText == docData){
-                        val data = hashMapOf("ユーザーの正誤" to "〇")
-                        userExamDocRef.set(data, SetOptions.merge())
-                            .addOnSuccessListener {
-                                Log.d("Firestore", "mosi de-ta hozonn kannryou")
-                                // 成功時の追加処理
-                            }
-                    }else{
-                        val data = hashMapOf("ユーザーの正誤" to "×")
-                        userExamDocRef.set(data, SetOptions.merge())
+            // 選択されたRadioButtonが存在する場合
+            if (selectedRadioButtonId != -1) {
+                val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+                val selectedText = selectedRadioButton.text.toString()  // 選択されたラジオボタンのテキストを取得
+                Log.d("SelectedAnswer", "選択された回答: $selectedText")
+                //一問目を保存する前にクリア
+                if (currentQuestNum == 1){ delete() }
+                correctReference(currentQuestNum).get().addOnSuccessListener { docmentSnapshot ->
+                    if (docmentSnapshot != null){
+                        val docData = docmentSnapshot.get("正解選択肢")
+                        if (selectedText == docData){
+                            val data = hashMapOf("ユーザーの正誤" to "〇")
+                            userExamDocRef.set(data, SetOptions.merge())
+                                .addOnSuccessListener {
+                                    Log.d("Firestore", "mosi de-ta hozonn kannryou")
+                                    // 成功時の追加処理
+                                }
+                        }else{
+                            val data = hashMapOf("ユーザーの正誤" to "×")
+                            userExamDocRef.set(data, SetOptions.merge())
+                        }
                     }
                 }
+            }else{
+                val data = hashMapOf("ユーザーの正誤" to "×")
+                userExamDocRef.set(data, SetOptions.merge())
             }
+            //今の画面を終了した後新たな画面を作成
+            finish()
+            val intent = Intent(this@ExamMainActivity, ExamMainActivity::class.java)
+            intent.putExtra("examNum",examName)
+            startActivity(intent)
+        }else if (currentQuestNum >30){
+            toMoveLearn("kill")
         }
-        //今の画面を終了した後新たな画面を作成
-        finish()
-        val intent = Intent(this@ExamMainActivity, ExamMainActivity::class.java)
-        intent.putExtra("examNum",examName)
-        startActivity(intent)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -263,8 +276,8 @@ class ExamMainActivity : AppCompatActivity() {
         var returnVal = true
         // 選択されたメニューが「戻る」の場合、アクティビティを終了。
         if (item.itemId == android.R.id.home) {
-            countDownTimer?.cancel()  // 戻るボタン押下時にタイマーをキャンセル
-            finish()
+            countDownTimer = null  // バックボタン押下時にタイマーをキャンセル
+            toMoveLearn()
         } else {
             returnVal = super.onOptionsItemSelected(item)
         }
@@ -276,18 +289,17 @@ class ExamMainActivity : AppCompatActivity() {
         override fun onClick(view: View) {
             when(view.id){
                 R.id.bt_back -> {
-                    countDownTimer?.cancel()  // バックボタン押下時にタイマーをキャンセル
+                    countDownTimer = null  // バックボタン押下時にタイマーをキャンセル
                     toMoveLearn()
                 }
                 R.id.bt_next -> {
-                    countDownTimer?.cancel()  // 次へボタン押下時にタイマーをキャンセル
+                    countDownTimer = null // 次へボタン押下時にタイマーをキャンセル
                     val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)
                     val selectedId = radioGroup.checkedRadioButtonId
                     //選択されていない場合は遷移しない
                     if (selectedId != -1) {
                         moveToNextScreen()  // 同じ画面に戻る
                     }
-
                 }
             }
         }
@@ -295,7 +307,7 @@ class ExamMainActivity : AppCompatActivity() {
 
     // アクティビティが破棄される際に、タイマーがまだ動作している場合に備えてキャンセル
     override fun onDestroy() {
-        countDownTimer?.cancel()  // アクティビティ終了時にタイマーをキャンセル
+        countdownJob = null
         super.onDestroy()
     }
 }
