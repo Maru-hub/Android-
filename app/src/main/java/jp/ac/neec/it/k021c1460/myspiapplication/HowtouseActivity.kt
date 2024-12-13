@@ -18,10 +18,10 @@ class HowtouseActivity : AppCompatActivity() {
 
         // 各説明用のTextViewを取得
         explanationTextViews = listOf(
-            findViewById(R.id.explanation_1),
-            findViewById(R.id.explanation_2),
-            findViewById(R.id.explanation_3),
-            findViewById(R.id.explanation_4)
+            findViewById(R.id.explanation_1), // 「このアプリを使うにあたって」
+            findViewById(R.id.explanation_2), // 「SPIについて」
+            findViewById(R.id.explanation_3), // 「能力検査の評価基準」
+            findViewById(R.id.explanation_4)  // 「テストの種類」
         )
 
         // 各ボタンを取得
@@ -31,6 +31,12 @@ class HowtouseActivity : AppCompatActivity() {
             findViewById(R.id.expand_button_3),
             findViewById(R.id.expand_button_4)
         )
+
+        // 初期表示: 選択された説明を表示
+        val explanationIndex = intent.getIntExtra("EXPLANATION_INDEX", -1)
+        if (explanationIndex in explanationTextViews.indices) {
+            toggleExplanation(explanationIndex)
+        }
 
         // 各ボタンにクリックリスナーを設定
         expandButtons.forEachIndexed { index, button ->

@@ -43,15 +43,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val returnVal = true
-        when(item.itemId){
-            R.id.menuListfirst -> {
-                val intent = Intent(this, HowtouseActivity::class.java)
-                startActivity(intent)
-            }
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.menuListfirst -> navigateToExplanation(0) // 「このアプリを使うにあたって」
+            R.id.menuListsecond -> navigateToExplanation(1) // 「SPIについて」
+            R.id.menuListthird -> navigateToExplanation(2) // 「能力検査の評価基準」
+            R.id.menuListfourth -> navigateToExplanation(3) // 「テストの種類」
         }
-        return returnVal
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun navigateToExplanation(index: Int) {
+        val intent = Intent(this, HowtouseActivity::class.java)
+        intent.putExtra("EXPLANATION_INDEX", index)
+        startActivity(intent)
     }
 
     private inner class HelloListener : View.OnClickListener {
