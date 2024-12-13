@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HowtouseActivity">
+
+    <!-- 「このアプリを使うにあたって」セクション -->
+
+    <TextView
+        android:id="@+id/text_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="このアプリを使うにあたって"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/expand_button_1"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/expand_button_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="▼"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_1" />
+
+    <TextView
+        android:id="@+id/explanation_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="このアプリは就職・転職活動において\n最も多く導入されている適性検査「SPI」の\n対策をすることを目的としています。
+        \nSPIの内容は、「性格検査」と「能力検査」の2つに\n分かれており、このアプリでの対策は「能力検査」を\n対象としています。"
+        android:textSize="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_1" />
+
+    <!-- 「分野について」セクション -->
+
+    <TextView
+        android:id="@+id/text_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="分野について"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/expand_button_2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/explanation_1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/expand_button_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="▼"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_2" />
+
+    <TextView
+        android:id="@+id/explanation_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="能力検査は大きく「言語」と「非言語」に分野が\n分けられます。
+        \n言語分野は読解力や日本語の語彙力を測る問題が出題され短期間で伸ばすのは難しい分野になります。
+        \nただし言語分野の中でも「二語の関係」の分野は短期間で伸ばすことができます。\n問題の形式に慣れておくことが重要です。"
+        android:textSize="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_2" />
+
+    <!-- 「テストの種類」セクション -->
+
+    <TextView
+        android:id="@+id/text_3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="能力検査の評価基準"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/expand_button_3"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/explanation_2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/expand_button_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="▼"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_3" />
+
+    <TextView
+        android:id="@+id/explanation_3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="SPIは単純な正解数のカウントによって評価されるテストとは違う評価の仕方をします。
+        \n問題に正解すると次は一つ難易度の高い問題が出題され、 問題に正解できないと一つ難易度の低い問題が出題されます。
+        \nこれを繰り返し確実に正解できる難易度を測り1から7段階で評価されます。\n評価の基準は企業によって異なりますが、
+        \n中堅企業を目指している人は4以上\n大手企業を目指している人は5以上\n人気企業を目指している人は6,7が基準になります。"
+        android:textSize="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_3" />
+
+    <!-- 「能力検査の評価基準」セクション -->
+
+    <TextView
+        android:id="@+id/text_4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="テストの種類"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/expand_button_4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/explanation_3" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/expand_button_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="▼"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_4" />
+
+    <TextView
+        android:id="@+id/explanation_4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="テストの受験方法は四つの種類があります。\nテストセンター…指定された試験会場にあるPCで受験します。
+        \nペンと計算用紙が渡されますが電卓の使用は禁止です。\n結果を他の企業の選考に使いまわすことができます。
+        \nWEBテスティング…自宅で受けることができる試験です。電卓が使用することができます。
+        \nペーパーテスティング…問題用紙が配られ決められた時間で解答します。
+        \nインハウスCB…企業に訪れた際に受ける試験になります、企業側の負担が大きいためこの形式を導入する企業は滅多にありません。
+        \nSPIの8～9割が「テストセンター」か「WEBテスティング」を採用しています。
+        \n自分の受ける企業の形式を把握し対策をすることをお勧めします。"
+        android:textSize="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_4" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="使い方 (How to use)"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

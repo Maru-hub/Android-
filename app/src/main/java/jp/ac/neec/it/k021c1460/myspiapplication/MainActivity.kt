@@ -46,19 +46,7 @@ class MainActivity : AppCompatActivity() {
         val returnVal = true
         when(item.itemId){
             R.id.menuListfirst -> {
-                val intent = Intent(this, FirstActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.menuListsecond -> {
-                val intent = Intent(this, SecondActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.menuListthird -> {
-                val intent = Intent(this, ThirdActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.menuListfourth -> {
-                val intent = Intent(this, FourthActivity::class.java)
+                val intent = Intent(this, HowtouseActivity::class.java)
                 startActivity(intent)
             }
             else -> super.onOptionsItemSelected(item)
