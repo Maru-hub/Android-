@@ -1,6 +1,7 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -14,7 +15,6 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -25,6 +25,9 @@ import kotlinx.coroutines.*
 
 var currentQuestNum = 0
 var totalTime = 0L
+
+
+
 class ExamMainActivity : AppCompatActivity() {
 
     private lateinit var circleProgressView: CircleProgressView
@@ -48,17 +51,13 @@ class ExamMainActivity : AppCompatActivity() {
     //変数
     var selectedExam = ""
 
-    //LearnActivityへの遷移
-    fun toMoveLearn( mode : String = "normal") {
-        if (totalTime != 0L && mode != "kill"){
-            val dialogBuilder = AlertDialog.Builder(this)
+    inner class DialogShow(private val context: Context){
+        fun showDialog(){
+            val dialogBuilder = AlertDialog.Builder(context)
             dialogBuilder.setTitle("確認")
                 .setMessage("模擬試験を終了しますよろしいですか？")
                 .setPositiveButton("はい") { _, _ ->
-                    finish()
-                    val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
-                    intent.putExtra("fromExamMain", "$selectedExam")
-                    startActivity(intent)
+                    Learning().moveToLearn()
                 }
                 .setNegativeButton("いいえ") { _, _ ->
                     //startCountDownTimerCoroutine() // タイマーを再開
@@ -67,8 +66,11 @@ class ExamMainActivity : AppCompatActivity() {
                     //startCountDownTimerCoroutine() // タイマーを再開
                 }
                 .show()
-        } else{
-            countdownJob = null  // 古いジョブをキャンセル
+        }
+    }
+
+    inner class Learning(){
+        fun moveToLearn(){
             finish()
             val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
             intent.putExtra("fromExamMain", "$selectedExam")
@@ -78,9 +80,71 @@ class ExamMainActivity : AppCompatActivity() {
 
 
     fun correctReference(refNum : Int): DocumentReference {
-        val partRef = db.collection("$examName").document("問題"+refNum)
+        val partRef = db.collection("模擬試験").document("問題"+refNum)
         val CorrectRef = partRef.collection("選択肢").document("正解選択肢")
         return CorrectRef
+    }
+
+    inner class AddRadioButton(private val context: Context){
+        fun addButton(value: Any) {
+            val RbOpt = RadioButton(context)
+            val RgOpt = findViewById<RadioGroup>(R.id.examRadioGroup)
+            RgOpt.addView(RbOpt)
+            //文字のレイアウト
+            val WC = LinearLayout.LayoutParams.WRAP_CONTENT
+            val MC = LinearLayout.LayoutParams.MATCH_PARENT
+            val LP = LinearLayout.LayoutParams(WC, MC)
+            RbOpt.layoutParams = LP
+            RbOpt.textSize = 18F
+            RbOpt.setPadding(0, 16, 0, 16)
+            RbOpt.text = value.toString()
+        }
+    }
+
+    inner class selection(){
+        fun getSize(examName: String){
+            val examRef = db.collection("$examName").document("問題"+ currentQuestNum)
+            val examOptRef = examRef.collection("選択肢").document("選択肢")
+            examOptRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null){
+                    val data = documentSnapshot.data
+                }
+            }
+        }
+
+        fun add(dataList: Map<String, Any>?){
+            if (dataList != null) {
+                for (data in dataList){
+                    AddRadioButton(this@ExamMainActivity).addButton(data)
+                }
+            }
+        }
+    }
+
+    inner class TypeCheck(){
+        var state:Boolean = false
+        fun IntCheck(data: Any?): Boolean{
+            if (data is Int){
+                state = true
+            }
+            return state
+        }
+        fun stringCheck(data: Any): Boolean{
+            if (data is String){
+                state = true
+            }
+            return state
+        }
+    }
+
+    private inner class saveExamQuestNum(){
+        var data: Int = 0
+        fun save(dataSize: Int) {
+            this.data = dataSize
+        }
+        fun get(): Int{
+            return this.data
+        }
     }
 
 
@@ -126,34 +190,6 @@ class ExamMainActivity : AppCompatActivity() {
                 Log.d(TAG, "log document Data: $docData")
             }
         }
-
-
-        val examOptRef = examRef.collection("選択肢").document("選択肢")
-        examOptRef.get().addOnSuccessListener { documentSnapshot ->
-            //documentはマップ？
-            val document = documentSnapshot.data
-            Log.d(TAG, "log document option Data: $document")
-
-            //radio button opt2 以降
-            fun add_option(key: String, value: Any) {
-                val RbOpt = RadioButton(this)
-                RgOpt.addView(RbOpt)
-                //文字のレイアウト
-                val WC = LinearLayout.LayoutParams.WRAP_CONTENT
-                val MC = LinearLayout.LayoutParams.MATCH_PARENT
-                val LP = LinearLayout.LayoutParams(WC, MC)
-                RbOpt.layoutParams = LP
-                RbOpt.textSize = 18F
-                RbOpt.setPadding(0, 16, 0, 16)
-                RbOpt.text = value.toString()
-            }
-
-            //val opt_Map = document?.filterKeys { key -> "option" in key }
-            if (document != null) {
-                for ((k, v) in document) {
-                    add_option(k, v)
-                }
-            }
 
             circleProgressView = findViewById(R.id.circleProgressView)
             timerTextView = findViewById(R.id.timerTextView)
