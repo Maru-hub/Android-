@@ -4,7 +4,6 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.text.Html
 import android.util.Log
 import android.view.MenuItem
@@ -17,7 +16,6 @@ import android.widget.TextView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.lang.Thread.sleep
 
 var currentQuestNum = 0
 
@@ -25,7 +23,6 @@ class ExamMainActivity : AppCompatActivity() {
 
     private lateinit var circleProgressView: CircleProgressView
     private lateinit var timerTextView: TextView
-    private var countDownTimer: CountDownTimer? = null  // タイマーを保持する変数
 
     //ユーザー認証
     private val auth = Firebase.auth
@@ -59,13 +56,13 @@ class ExamMainActivity : AppCompatActivity() {
     }
 
     fun moveLearn(){
-        CountCancel().setState(true)
         finish()
         val intent = Intent(this@ExamMainActivity, LearnActivity::class.java)
         intent.putExtra("fromExamMain", "$selectedExam")
         startActivity(intent)
-        CountCancel().setState(false)
+        Timer().stopCount(timerTextView)
     }
+
     var examName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,8 +141,6 @@ class ExamMainActivity : AppCompatActivity() {
                 }
             }
 
-
-
             // ホームボタンであるButtonオブジェクトを取得
             val btBack = findViewById<Button>(R.id.bt_back)
             val btNext = findViewById<Button>(R.id.bt_next)
@@ -196,7 +191,6 @@ class ExamMainActivity : AppCompatActivity() {
         var returnVal = true
         // 選択されたメニューが「戻る」の場合、アクティビティを終了。
         if (item.itemId == android.R.id.home) {
-            countDownTimer = null  // バックボタン押下時にタイマーをキャンセル
             toMoveLearn()
         } else {
             returnVal = super.onOptionsItemSelected(item)
@@ -209,11 +203,10 @@ class ExamMainActivity : AppCompatActivity() {
         override fun onClick(view: View) {
             when(view.id){
                 R.id.bt_back -> {
-                    countDownTimer = null  // バックボタン押下時にタイマーをキャンセル
                     toMoveLearn()
                 }
                 R.id.bt_next -> {
-                    countDownTimer = null // 次へボタン押下時にタイマーをキャンセル
+                    Timer().stopCount(timerTextView)
                     val radioGroup = findViewById<RadioGroup>(R.id.examRadioGroup)
                     val selectedId = radioGroup.checkedRadioButtonId
                     //選択されていない場合は遷移しない
