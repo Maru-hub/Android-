@@ -1,14 +1,17 @@
 package jp.ac.neec.it.k021c1460.myspiapplication
 
 import android.app.AlertDialog
+import android.content.ContentValues.TAG
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
+import android.widget.Toast
 
 class ExamActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,10 +85,14 @@ class ExamActivity : AppCompatActivity() {
                     "※問題数は30問あります。\n一回終了すると最初からになってしまいます。")
             .setPositiveButton("はい") { _, _ ->
                 // 試験開始画面に遷移
-                val intent2Teststart = Intent(this@ExamActivity, ExamMainActivity::class.java)
-                intent2Teststart.putExtra("examNum",selectedItem)
-                startActivity(intent2Teststart)
-                finish()
+
+
+                if(UserExist().LoginCheck(this)){
+                    val intent2Teststart = Intent(this@ExamActivity, ExamMainActivity::class.java)
+                    intent2Teststart.putExtra("examNum",selectedItem)
+                    startActivity(intent2Teststart)
+                    finish()
+                }
             }
             .setNegativeButton("いいえ", null) // 何もしない
             .show()
