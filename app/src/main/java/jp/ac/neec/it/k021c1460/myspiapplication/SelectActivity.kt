@@ -35,7 +35,7 @@ class SelectActivity : AppCompatActivity() {
         val itemWhich = intent.getStringExtra("itemWhich")
         val tableLayout = findViewById<TableLayout>(R.id.tableLayout)
 
-        val tv8 = findViewById<TextView>(R.id.textView8)
+        val tv8 = findViewById<TextView>(R.id.tv_explanation)
         tv8.text = itemName
 
 
