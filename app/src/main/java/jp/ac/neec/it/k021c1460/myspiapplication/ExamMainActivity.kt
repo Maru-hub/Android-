@@ -20,7 +20,6 @@ import com.google.firebase.ktx.Firebase
 import java.lang.Thread.sleep
 
 var currentQuestNum = 0
-var totalTime = 0L
 
 class ExamMainActivity : AppCompatActivity() {
 
@@ -48,7 +47,7 @@ class ExamMainActivity : AppCompatActivity() {
 
     //LearnActivityへの遷移
     fun toMoveLearn(mode : String = "normal") {
-        if (totalTime != 0L && mode != "kill"){
+        if (Timer().totalTime != 0 && mode != "kill"){
             //totalTimeが0Lならdialogは表示しない
             //modeがkillならdialogは表示しない
             if (Dialog().show(this)){
@@ -74,8 +73,12 @@ class ExamMainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_exam_main)
 
         currentQuestNum += 1
+
+        circleProgressView = findViewById(R.id.circleProgressView)
+        timerTextView = findViewById(R.id.timerTextView)
+
         if (currentQuestNum <= 30){
-            startCountDown()
+            Timer().startCount(timerTextView,circleProgressView)
         }
 
         val RgOpt = findViewById<RadioGroup>(R.id.examRadioGroup)
@@ -141,8 +144,7 @@ class ExamMainActivity : AppCompatActivity() {
                 }
             }
 
-            circleProgressView = findViewById(R.id.circleProgressView)
-            timerTextView = findViewById(R.id.timerTextView)
+
 
             // ホームボタンであるButtonオブジェクトを取得
             val btBack = findViewById<Button>(R.id.bt_back)
@@ -163,40 +165,6 @@ class ExamMainActivity : AppCompatActivity() {
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
-    private fun startCountDown() {
-        timerTextView = findViewById(R.id.timerTextView)
-        circleProgressView = findViewById(R.id.circleProgressView)
-
-        totalTime = 30 * 1000L
-        var remainingTime = totalTime
-
-        // タイマーのカウントダウン処理
-        while (remainingTime > 0) {
-            if (CountCancel().getState()) {  // フラグをチェック
-                Log.d("","タイマーキャンセル実行")
-                break  // ループ終了
-                }
-            val secondsLeft = remainingTime / 1000
-            timerTextView.text = "残り時間: $secondsLeft 秒"
-            circleProgressView.setProgress((totalTime - remainingTime) / totalTime.toFloat())
-            sleep(1000)  // 1秒待機
-            remainingTime -= 1000
-        }
-
-        // タイマーが終了した場合の処理
-        if (!CountCancel().getState()) {  // キャンセルされていない場合のみ実行
-            timerTextView.text = "残り時間: 0 秒"
-            if (currentQuestNum <= 30) {
-                Log.d("","残り時間$remainingTime 秒、画面遷移実行")
-                moveToNextScreen()  // 次の画面へ遷移
-            }
-        }
-    }
-
-
-
-
 
     // 次の画面に遷移するメソッド
     private fun moveToNextScreen() {
