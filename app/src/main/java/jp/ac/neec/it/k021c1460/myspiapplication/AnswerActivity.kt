@@ -17,12 +17,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.ktx.firestore
 
 class AnswerActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -43,8 +40,6 @@ class AnswerActivity : AppCompatActivity() {
         btNext.setOnClickListener(listener)
 
         val db = Firebase.firestore
-
-
 
         val RgOpt = findViewById<RadioGroup>(R.id.radioGroup)
 

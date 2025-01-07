@@ -16,6 +16,11 @@ class CircleProgressView(context: Context, attrs: AttributeSet) : View(context, 
         paint.isAntiAlias = true
     }
 
+    fun toFloat(totalTime:Int,timeRemaining:Int){
+        val float = (totalTime - timeRemaining) / totalTime.toFloat()
+        setProgress(float)
+    }
+
     fun setProgress(progress: Float) {
         this.progress = progress
         invalidate() // 再描画

@@ -5,29 +5,41 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.SetOptions
 
 class CheckAnswer {
-    fun check(reference: DocumentReference, userExamDocRef: DocumentReference,
-              selectedRadioButtonId: Int, selectedText: String){
+    fun check(answerRef: DocumentReference, userAnswerRef: DocumentReference,
+              selectedRadioButtonId: Int = -1, selectedText: String = "no select"){
         if (selectedRadioButtonId != -1) {
-        Log.d("SelectedAnswer", "選択された回答: $selectedText")
-        //一問目を保存する前にクリア
-        reference.get().addOnSuccessListener { docmentSnapshot ->
-            if (docmentSnapshot != null){
-                val docData = docmentSnapshot.get("正解選択肢")
-                if (selectedText == docData){
-                    val data = hashMapOf("ユーザーの正誤" to "〇")
-                    userExamDocRef.set(data, SetOptions.merge())
-                        .addOnSuccessListener {
-                            // 成功時の追加処理
-                        }
-                }else{
-                    val data = hashMapOf("ユーザーの正誤" to "×")
-                    userExamDocRef.set(data, SetOptions.merge())
+            Log.d("SelectedAnswer", "選択された回答: $selectedText")
+            //一問目を保存する前にクリア
+            answerRef.get().addOnSuccessListener { docmentSnapshot ->
+                if (docmentSnapshot != null){
+                    val docData = docmentSnapshot.get("正解選択肢")
+                    if (selectedText == docData){
+                        val data = hashMapOf("ユーザーの正誤" to "〇")
+                        set(userAnswerRef,data)
+
+                    }else{
+                        //何も選択されていない場合は×
+                        val data = hashMapOf("ユーザーの正誤" to "×")
+                        set(userAnswerRef,data)
+                    }
                 }
             }
+        }else{
+            val data = hashMapOf("ユーザーの正誤" to "×")
+            set(userAnswerRef,data)
         }
-    }else{
-        val data = hashMapOf("ユーザーの正誤" to "×")
-        userExamDocRef.set(data, SetOptions.merge())
     }
+
+    fun set(ref: DocumentReference, data: HashMap<String, String>) {
+        ref.set(data, SetOptions.merge())
+            .addOnSuccessListener {
+                // 成功した場合の処理
+                println("Document successfully written! by CheckAnswer Class")
+            }
+            .addOnFailureListener { e ->
+                // 失敗した場合の処理
+                println("Error writing document: ${e.message} by CheckAnswer Class")
+            }
     }
+
 }

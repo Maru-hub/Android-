@@ -5,8 +5,5 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class Firestore {
-    fun get(): FirebaseFirestore {
         val db = Firebase.firestore
-        return db
-    }
 }
