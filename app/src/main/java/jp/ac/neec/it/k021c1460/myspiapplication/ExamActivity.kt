@@ -41,7 +41,8 @@ class ExamActivity : AppCompatActivity() {
         // スピナーにアダプターをセット
         spinner.adapter = adapter
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true) // 戻るボタンを表示にする
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -55,6 +56,7 @@ class ExamActivity : AppCompatActivity() {
         }
         return returnVal
     }
+
     //戻るボタンをタップした時の処理。
     private inner class HelloListener : View.OnClickListener {
         override fun onClick(view: View) {
@@ -92,5 +94,4 @@ class ExamActivity : AppCompatActivity() {
             .setNegativeButton("いいえ", null) // 何もしない
             .show()
     }
-
 }

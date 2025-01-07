@@ -46,6 +46,7 @@ class ExamMainActivity : AppCompatActivity() {
         Timer().stopCount()
     }
     */
+
     val timer = Timer(this@ExamMainActivity)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,12 +61,9 @@ class ExamMainActivity : AppCompatActivity() {
         //examNameは前の画面のspinnerで選択させた値にする。
         examName = intent.getStringExtra("examName").toString()
 
-        //何も選択肢を選択肢していないと「次へ」ボタンは押せない
-        //if(RgOpt.checkedRadioButtonId == -1){btNext.visibility = View.INVISIBLE}
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(false) // 戻るボタンを非表示にする
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 戻り値用の変数を初期値trueで用意

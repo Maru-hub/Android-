@@ -6,6 +6,7 @@ import android.text.Html
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -23,7 +24,6 @@ class ExamAnswerFragment : Fragment(R.layout.fragment_exam_answer) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         fragmentView = view  // Fragment全体のViewを保持
 
@@ -60,6 +60,8 @@ class ExamAnswerFragment : Fragment(R.layout.fragment_exam_answer) {
         }
     }
 
+
+
     private inner class ButtonClickListener : View.OnClickListener {
         override fun onClick(view: View) {
             when (view.id) {
@@ -94,7 +96,9 @@ class ExamAnswerFragment : Fragment(R.layout.fragment_exam_answer) {
                     // ボタンの終了処理
                     val context = requireContext()
                     CoroutineScope(Dispatchers.Main).launch {
-                        if(Dialog().show(context)) {
+                        val result = Dialog().show(context)
+                        println(result)
+                        if(result) {
                             requireActivity().finish()
                         }
                     }
